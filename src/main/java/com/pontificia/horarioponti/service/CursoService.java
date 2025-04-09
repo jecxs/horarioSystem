@@ -2,211 +2,190 @@ package com.pontificia.horarioponti.service;
 
 import com.pontificia.horarioponti.dtos.CursoDTO;
 import com.pontificia.horarioponti.dtos.FiltrosCursoDTO;
+import com.pontificia.horarioponti.repository.CarreraRepository;
 import com.pontificia.horarioponti.repository.CicloRepository;
 import com.pontificia.horarioponti.repository.CursoRepository;
+import com.pontificia.horarioponti.repository.ModalidadEducativaRepository;
 import com.pontificia.horarioponti.repository.model.AsignacionHorario;
 import com.pontificia.horarioponti.repository.model.Ciclo;
 import com.pontificia.horarioponti.repository.model.Curso;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CursoService {
 
-    private final CursoRepository cursoRepository;
-    private final CicloRepository cicloRepository;
+    @Autowired
+    private CursoRepository cursoRepository;
 
-    public List<CursoDTO> getAllCursos() {
+    @Autowired
+    private CicloRepository cicloRepository;
+
+    @Autowired
+    private CarreraRepository carreraRepository;
+
+    @Autowired
+    private ModalidadEducativaRepository modalidadRepository;
+
+    /**
+     * Obtiene todos los cursos
+     */
+    public List<CursoDTO> obtenerTodosCursos() {
         return cursoRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public CursoDTO getCursoById(Long id) {
-        Curso curso = cursoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Curso no encontrado con ID: " + id));
-
-        return convertToDTO(curso);
+    /**
+     * Obtiene un curso por ID
+     */
+    public CursoDTO obtenerCursoPorId(Long id) {
+        Optional<Curso> cursoOpt = cursoRepository.findById(id);
+        return cursoOpt.map(this::convertirADTO).orElse(null);
     }
 
-    @Transactional
-    public CursoDTO createCurso(CursoDTO cursoDTO) {
-        // Validar que exista el ciclo
-        Ciclo ciclo = obtenerCicloPorId(cursoDTO.getCicloNombre());
+    /**
+     * Filtra cursos según criterios
+     */
+    public List<CursoDTO> filtrarCursos(FiltrosCursoDTO filtros) {
+        List<Curso> cursos = new ArrayList<>();
 
-        // Validar que no exista un curso con el mismo nombre en el mismo ciclo
-        if (cursoRepository.existsByNombreAndCiclo(cursoDTO.getNombre(), ciclo)) {
-            throw new RuntimeException("Ya existe un curso con el nombre " + cursoDTO.getNombre() + " en el ciclo " + ciclo.getNumero());
+        // Aplicar filtros en orden de especificidad
+        if (filtros.getModalidadId() != null) {
+            if (filtros.getCarreraId() != null) {
+                if (filtros.getCicloId() != null) {
+                    // Filtrar por ciclo
+                    Optional<Ciclo> cicloOpt = cicloRepository.findById(filtros.getCicloId());
+                    if (cicloOpt.isPresent()) {
+                        cursos = cursoRepository.findByCiclo(cicloOpt.get());
+                    }
+                } else {
+                    // Filtrar por carrera
+                    cursos = cursoRepository.findByCarreraId(filtros.getCarreraId());
+                }
+            } else {
+                // Filtrar por modalidad
+                cursos = cursoRepository.findByModalidadId(filtros.getModalidadId());
+            }
+        } else {
+            // Sin filtros específicos, traer todos
+            cursos = cursoRepository.findAll();
         }
 
+        // Filtrar por nombre si se especificó
+        if (filtros.getNombreCurso() != null && !filtros.getNombreCurso().trim().isEmpty()) {
+            cursos = cursos.stream()
+                    .filter(c -> c.getNombre().toLowerCase().contains(filtros.getNombreCurso().toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        return cursos.stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Crea un nuevo curso
+     */
+    @Transactional
+    public CursoDTO crearCurso(CursoDTO cursoDTO, Long cicloId) {
+        // Verificar que exista el ciclo
+        Optional<Ciclo> cicloOpt = cicloRepository.findById(cicloId);
+        if (!cicloOpt.isPresent()) {
+            return null;
+        }
+
+        Ciclo ciclo = cicloOpt.get();
+
+        // Verificar si ya existe un curso con el mismo nombre en el ciclo
+        if (cursoRepository.existsByNombreAndCiclo(cursoDTO.getNombre(), ciclo)) {
+            return null;
+        }
+
+        // Crear el nuevo curso
         Curso curso = new Curso();
         curso.setNombre(cursoDTO.getNombre());
         curso.setTipo(cursoDTO.getTipo());
         curso.setHorasSemana(cursoDTO.getHorasSemana());
         curso.setCiclo(ciclo);
+        curso.setAsignaciones(new ArrayList<>());
 
-        Curso savedCurso = cursoRepository.save(curso);
-
-        return convertToDTO(savedCurso);
+        // Guardar y convertir
+        Curso cursoGuardado = cursoRepository.save(curso);
+        return convertirADTO(cursoGuardado);
     }
 
+    /**
+     * Actualiza un curso existente
+     */
     @Transactional
-    public CursoDTO updateCurso(Long id, CursoDTO cursoDTO) {
-        Curso curso = cursoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Curso no encontrado con ID: " + id));
+    public CursoDTO actualizarCurso(Long id, CursoDTO cursoDTO, Long cicloId) {
+        // Verificar que existan el curso y el ciclo
+        Optional<Curso> cursoOpt = cursoRepository.findById(id);
+        Optional<Ciclo> cicloOpt = cicloRepository.findById(cicloId);
 
-        // Validar que exista el ciclo
-        Ciclo ciclo = obtenerCicloPorId(cursoDTO.getCicloNombre());
-
-        // Validar que no exista otro curso con el mismo nombre en el mismo ciclo
-        if (!curso.getNombre().equals(cursoDTO.getNombre()) &&
-                cursoRepository.existsByNombreAndCiclo(cursoDTO.getNombre(), ciclo)) {
-            throw new RuntimeException("Ya existe un curso con el nombre " + cursoDTO.getNombre() + " en el ciclo " + ciclo.getNumero());
+        if (!cursoOpt.isPresent() || !cicloOpt.isPresent()) {
+            return null;
         }
 
+        Curso curso = cursoOpt.get();
+        Ciclo ciclo = cicloOpt.get();
+
+        // Verificar si hay otro curso (no este mismo) con el mismo nombre en el ciclo
+        boolean existeOtro = cursoRepository.findByCiclo(ciclo).stream()
+                .anyMatch(c -> c.getNombre().equals(cursoDTO.getNombre()) && !c.getIdCurso().equals(id));
+
+        if (existeOtro) {
+            return null;
+        }
+
+        // Actualizar datos
         curso.setNombre(cursoDTO.getNombre());
         curso.setTipo(cursoDTO.getTipo());
         curso.setHorasSemana(cursoDTO.getHorasSemana());
         curso.setCiclo(ciclo);
 
-        Curso updatedCurso = cursoRepository.save(curso);
-
-        return convertToDTO(updatedCurso);
+        // Guardar y convertir
+        Curso cursoGuardado = cursoRepository.save(curso);
+        return convertirADTO(cursoGuardado);
     }
 
+    /**
+     * Elimina un curso si no tiene asignaciones
+     */
     @Transactional
-    public void deleteCurso(Long id) {
-        Curso curso = cursoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Curso no encontrado con ID: " + id));
-
-        // Verificar si tiene asignaciones
-        if (curso.getAsignaciones() != null && !curso.getAsignaciones().isEmpty()) {
-            throw new RuntimeException("No se puede eliminar el curso porque tiene asignaciones de horario");
-        }
-
-        cursoRepository.delete(curso);
-    }
-
-    public List<CursoDTO> getCursosByCarrera(Long carreraId) {
-        return cursoRepository.findByCarreraId(carreraId).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<CursoDTO> getCursosByModalidad(Long modalidadId) {
-        return cursoRepository.findByModalidadId(modalidadId).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<CursoDTO> getCursosByCiclo(Long cicloId) {
-        Ciclo ciclo = cicloRepository.findById(cicloId)
-                .orElseThrow(() -> new RuntimeException("Ciclo no encontrado con ID: " + cicloId));
-
-        return cursoRepository.findByCiclo(ciclo).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<CursoDTO> getCursosByNombre(String nombre) {
-        return cursoRepository.findByNombreContainingIgnoreCase(nombre).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<CursoDTO> getCursosFiltrados(FiltrosCursoDTO filtros) {
-        List<Curso> cursos;
-
-        if (filtros.getCicloId() != null) {
-            Ciclo ciclo = cicloRepository.findById(filtros.getCicloId())
-                    .orElseThrow(() -> new RuntimeException("Ciclo no encontrado con ID: " + filtros.getCicloId()));
-            cursos = cursoRepository.findByCiclo(ciclo);
-        } else if (filtros.getCarreraId() != null) {
-            cursos = cursoRepository.findByCarreraId(filtros.getCarreraId());
-        } else if (filtros.getModalidadId() != null) {
-            cursos = cursoRepository.findByModalidadId(filtros.getModalidadId());
-        } else if (filtros.getNombreCurso() != null && !filtros.getNombreCurso().isEmpty()) {
-            cursos = cursoRepository.findByNombreContainingIgnoreCase(filtros.getNombreCurso());
-        } else {
-            cursos = cursoRepository.findAll();
-        }
-
-        return cursos.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    // Método para obtener la cantidad total de horas asignadas a un curso
-    public int getHorasAsignadas(Long cursoId) {
-        Curso curso = cursoRepository.findById(cursoId)
-                .orElseThrow(() -> new RuntimeException("Curso no encontrado con ID: " + cursoId));
-
-        int horasAsignadas = 0;
-        if (curso.getAsignaciones() != null) {
-            for (AsignacionHorario asignacion : curso.getAsignaciones()) {
-                // Cada bloque horario es típicamente de 45 minutos (o lo que se haya configurado)
-                horasAsignadas += asignacion.getBloques().size();
+    public boolean eliminarCurso(Long id) {
+        Optional<Curso> cursoOpt = cursoRepository.findById(id);
+        if (cursoOpt.isPresent()) {
+            Curso curso = cursoOpt.get();
+            // Verificar si tiene asignaciones
+            if (curso.getAsignaciones() == null || curso.getAsignaciones().isEmpty()) {
+                cursoRepository.delete(curso);
+                return true;
             }
         }
-
-        // Convertir bloques a horas (cada bloque es de 45 minutos = 0.75 horas)
-        return (int) Math.ceil(horasAsignadas * 0.75);
+        return false;
     }
 
-    // Método para verificar si ya se han asignado todas las horas semanales requeridas
-    public boolean verificarHorasCompletadas(Long cursoId) {
-        Curso curso = cursoRepository.findById(cursoId)
-                .orElseThrow(() -> new RuntimeException("Curso no encontrado con ID: " + cursoId));
-
-        int horasAsignadas = getHorasAsignadas(cursoId);
-        return horasAsignadas >= curso.getHorasSemana();
-    }
-
-    private Ciclo obtenerCicloPorId(String cicloNombre) {
-        try {
-            Long cicloId = Long.parseLong(cicloNombre);
-            return cicloRepository.findById(cicloId)
-                    .orElseThrow(() -> new RuntimeException("Ciclo no encontrado con ID: " + cicloId));
-        } catch (NumberFormatException e) {
-            // Si no es un ID, intentar extraer el número del formato "Ciclo X"
-            if (cicloNombre != null && cicloNombre.startsWith("Ciclo ")) {
-                try {
-                    String numeroStr = cicloNombre.substring(6).trim();
-                    Integer numero = Integer.parseInt(numeroStr);
-                    // Aquí, idealmente necesitaríamos la carrera también, pero como es solo referencia interna,
-                    // podríamos buscar el primero que coincida con ese número
-                    List<Ciclo> ciclos = cicloRepository.findAll().stream()
-                            .filter(c -> c.getNumero().equals(numero))
-                            .collect(Collectors.toList());
-
-                    if (!ciclos.isEmpty()) {
-                        return ciclos.get(0);
-                    }
-                } catch (Exception ex) {
-                    throw new RuntimeException("Formato de ciclo inválido: " + cicloNombre);
-                }
-            }
-            throw new RuntimeException("Ciclo no encontrado: " + cicloNombre);
-        }
-    }
-
-    private CursoDTO convertToDTO(Curso curso) {
-        CursoDTO dto = new CursoDTO();
-        dto.setIdCurso(curso.getIdCurso());
-        dto.setNombre(curso.getNombre());
-        dto.setTipo(curso.getTipo());
-        dto.setHorasSemana(curso.getHorasSemana());
-
-        // Información del ciclo
-        dto.setCicloNombre("Ciclo " + curso.getCiclo().getNumero());
-        dto.setCarreraNombre(curso.getCiclo().getCarrera().getNombre());
-        dto.setModalidadNombre(curso.getCiclo().getCarrera().getModalidad().getNombre());
-
-        return dto;
+    /**
+     * Convierte una entidad Curso a DTO
+     */
+    private CursoDTO convertirADTO(Curso curso) {
+        return new CursoDTO(
+                curso.getIdCurso(),
+                curso.getNombre(),
+                curso.getTipo(),
+                curso.getHorasSemana(),
+                curso.getCiclo().getNumero().toString(),
+                curso.getCiclo().getCarrera().getNombre(),
+                curso.getCiclo().getCarrera().getModalidad().getNombre()
+        );
     }
 }
