@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | Sistema de Horarios'">Sistema de Horarios</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <style>
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .dropdown-menu {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .horario-cell {
+            height: 60px;
+            cursor: pointer;
+            border: 1px solid #dee2e6;
+        }
+        .horario-cell:hover {
+            background-color: #f1f1f1;
+        }
+        .horario-cell.asignado {
+            background-color: #d1e7dd;
+        }
+        .horario-cell.no-disponible {
+            background-color: #f8d7da;
+        }
+        .horario-cell.disponible {
+            background-color: #fff;
+            border: 1px dashed #adb5bd;
+        }
+        .day-column {
+            min-width: 150px;
+        }
+        .time-cell {
+            height: 60px;
+            background-color: #e9ecef;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header th:fragment="header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-calendar-alt me-2"></i>Sistema de Horarios
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentPage == '/' ? 'active' : ''}" href="/">
+                            <i class="fas fa-home me-1"></i>Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentPage == '/tablero' ? 'active' : ''}" href="/tablero">
+                            <i class="fas fa-th me-1"></i>Tablero de Horarios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentPage == '/docentes' ? 'active' : ''}" href="/docentes">
+                            <i class="fas fa-chalkboard-teacher me-1"></i>Docentes
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="configuracionDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-cogs me-1"></i>Configuración
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="configuracionDropdown">
+                            <li><a class="dropdown-item" href="/configuracion/modalidades">Modalidades Educativas</a></li>
+                            <li><a class="dropdown-item" href="/configuracion/carreras">Carreras</a></li>
+                            <li><a class="dropdown-item" href="/configuracion/ciclos">Ciclos</a></li>
+                            <li><a class="dropdown-item" href="/cursos">Cursos</a></li>
+                            <li><a class="dropdown-item" href="/ambientes">Ambientes</a></li>
+                            <li><a class="dropdown-item" href="/configuracion/turnos">Turnos</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Sidebar fragment -->
+<div th:fragment="sidebar" class="sidebar p-3">
+    <h5>Filtros</h5>
+    <hr>
+    <div class="mb-3">
+        <label for="modalidadFilter" class="form-label">Modalidad:</label>
+        <select id="modalidadFilter" class="form-select form-select-sm">
+            <option value="">Todas las modalidades</option>
+            <option th:each="modalidad : ${modalidades}"
+                    th:value="${modalidad.idModalidad}"
+                    th:text="${modalidad.nombre}"></option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="carreraFilter" class="form-label">Carrera:</label>
+        <select id="carreraFilter" class="form-select form-select-sm">
+            <option value="">Todas las carreras</option>
+            <!-- Se llenará con JavaScript -->
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="cicloFilter" class="form-label">Ciclo:</label>
+        <select id="cicloFilter" class="form-select form-select-sm">
+            <option value="">Todos los ciclos</option>
+            <!-- Se llenará con JavaScript -->
+        </select>
+    </div>
+    <hr>
+    <div class="d-grid gap-2">
+        <button id="btnCrearCurso" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearCurso">
+            <i class="fas fa-plus-circle me-1"></i>Crear Curso
+        </button>
+        <button id="btnCrearAmbiente" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearAmbiente">
+            <i class="fas fa-plus-circle me-1"></i>Crear Ambiente
+        </button>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:fragment="footer" class="bg-light text-center text-muted py-3 mt-auto">
+    <div class="container">
+        <p class="mb-0">Sistema de Horarios Docentes &copy; 2025</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <!-- Script para acciones comunes -->
+    <script>
+        // Scripts comunes
+        $(document).ready(function() {
+            // Filtrado dinámico de carreras según modalidad
+            $('#modalidadFilter').change(function() {
+                const modalidadId = $(this).val();
+                if (modalidadId) {
+                    $.ajax({
+                        url: `/cursos/carreras-por-modalidad/${modalidadId}`,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#carreraFilter').empty();
+                            $('#carreraFilter').append('<option value="">Todas las carreras</option>');
+                            data.forEach(function(carrera) {
+                                $('#carreraFilter').append(`<option value="${carrera.idCarrera}">${carrera.nombre}</option>`);
+                            });
+                        }
+                    });
+                } else {
+                    $('#carreraFilter').empty();
+                    $('#carreraFilter').append('<option value="">Todas las carreras</option>');
+                }
+                // Limpiar ciclos
+                $('#cicloFilter').empty();
+                $('#cicloFilter').append('<option value="">Todos los ciclos</option>');
+            });
+
+            // Filtrado dinámico de ciclos según carrera
+            $('#carreraFilter').change(function() {
+                const carreraId = $(this).val();
+                if (carreraId) {
+                    $.ajax({
+                        url: `/cursos/ciclos-por-carrera/${carreraId}`,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#cicloFilter').empty();
+                            $('#cicloFilter').append('<option value="">Todos los ciclos</option>');
+                            data.forEach(function(ciclo) {
+                                $('#cicloFilter').append(`<option value="${ciclo.idCiclo}">Ciclo ${ciclo.numero}</option>`);
+                            });
+                        }
+                    });
+                } else {
+                    $('#cicloFilter').empty();
+                    $('#cicloFilter').append('<option value="">Todos los ciclos</option>');
+                }
+            });
+
+            // Tooltips de Bootstrap
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        });
+    </script>
+</footer>
+</body>
+</html>
