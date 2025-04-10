@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface AsignacionHorarioRepository extends JpaRepository<AsignacionHorario, Long> {
 
+    List<AsignacionHorario> findByCursoAndGrupo(Curso curso, Grupo grupo);
+
     List<AsignacionHorario> findByDocente(Docente docente);
 
     List<AsignacionHorario> findByGrupo(Grupo grupo);
@@ -37,5 +39,5 @@ public interface AsignacionHorarioRepository extends JpaRepository<AsignacionHor
             "AND b.idBloque IN :bloqueIds")
     boolean existsConflictoGrupoEnBloques(Long grupoId, DisponibilidadDocente.DiaSemana diaSemana, List<Long> bloqueIds);
 
-    List<AsignacionHorario> findByCursoAndGrupo(Curso curso, Grupo grupo);
+
 }

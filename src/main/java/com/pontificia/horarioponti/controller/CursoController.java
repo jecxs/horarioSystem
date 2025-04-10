@@ -2,6 +2,7 @@ package com.pontificia.horarioponti.controller;
 
 import com.pontificia.horarioponti.dtos.CursoDTO;
 import com.pontificia.horarioponti.dtos.GrupoDTO;
+import com.pontificia.horarioponti.repository.CicloRepository;
 import com.pontificia.horarioponti.repository.model.Carrera;
 import com.pontificia.horarioponti.repository.model.Ciclo;
 import com.pontificia.horarioponti.repository.model.ModalidadEducativa;
@@ -13,8 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/cursos")
@@ -28,6 +28,9 @@ public class CursoController {
 
     @Autowired
     private CarreraService carreraService;
+
+    @Autowired
+    private CicloRepository cicloRepository;
 
     /**
      * Obtiene todos los cursos
@@ -259,5 +262,24 @@ public class CursoController {
         }
 
         return ResponseEntity.ok(grupos);
+    }
+    @GetMapping("/ciclo/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Long>> obtenerInfoCiclo(@PathVariable Long id) {
+        Optional<Ciclo> cicloOpt = cicloRepository.findById(id);
+        if (!cicloOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Ciclo ciclo = cicloOpt.get();
+        Carrera carrera = ciclo.getCarrera();
+        ModalidadEducativa modalidad = carrera.getModalidad();
+
+        Map<String, Long> info = new HashMap<>();
+        info.put("cicloId", ciclo.getIdCiclo());
+        info.put("carreraId", carrera.getIdCarrera());
+        info.put("modalidadId", modalidad.getIdModalidad());
+
+        return ResponseEntity.ok(info);
     }
 }

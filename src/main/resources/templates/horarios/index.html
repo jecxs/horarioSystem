@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html(~{::title}, ~{::div#content}, ~{::style}, ~{::script})}">
 <head>
+
     <title>Tablero de Horarios</title>
     <style th:replace="~{horarios/fragments/styles :: styles}"></style>
 </head>
@@ -63,14 +64,66 @@
             });
         }
 
+
+// Modificar la función mostrarInfoDocente para añadir información sobre disponibilidad
         function mostrarInfoDocente() {
             $("#nombreDocente").text(docenteSeleccionado.nombreCompleto);
             $("#especialidadDocente").text(docenteSeleccionado.especialidad || "Sin especialidad");
-            $("#infoDocente").show();
+
+            // Añadir información sobre disponibilidad
+            let disponibilidadHTML = '';
+
+            if (docenteSeleccionado.disponibilidades && docenteSeleccionado.disponibilidades.length > 0) {
+                disponibilidadHTML = `
+            <div class="mt-2">
+                <span class="badge bg-success">Disponible</span>
+                ${docenteSeleccionado.disponibilidades.length} horarios registrados
+                <button class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalDisponibilidad">
+                    Ver detalles
+                </button>
+            </div>
+        `;
+            } else {
+                disponibilidadHTML = `
+            <div class="mt-2 text-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                No hay horarios de disponibilidad registrados
+                <button class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalDisponibilidad">
+                    Registrar disponibilidad
+                </button>
+            </div>
+        `;
+            }
+
+            // Añadir resumen de asignaciones
+            let totalAsignaciones = 0;
+            for (const dia in horarioData.asignacionesPorDia) {
+                totalAsignaciones += horarioData.asignacionesPorDia[dia].length;
+            }
+
+            let asignacionesHTML = `
+        <div class="mt-2">
+            <span class="badge bg-primary">Asignaciones</span>
+            ${totalAsignaciones} sesiones asignadas
+        </div>
+    `;
+
+            $("#infoDocente").html(`
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">${docenteSeleccionado.nombreCompleto}</h5>
+                <p class="card-text">${docenteSeleccionado.especialidad || "Sin especialidad"}</p>
+                ${disponibilidadHTML}
+                ${asignacionesHTML}
+            </div>
+        </div>
+    `).show();
+
             $("#asignacionDocenteId").val(docenteSeleccionado.idDocente);
             cargarDisponibilidadDocente();
         }
 
+        // Modificar la función construirTablaHorario para mejorar la visualización de disponibilidad
         function construirTablaHorario() {
             // Obtener todos los bloques para construir la tabla
             $.ajax({
@@ -93,8 +146,6 @@
                         tr.append(`<td class="fw-bold">${bloque.horaInicio.substring(0, 5)} - ${bloque.horaFin.substring(0, 5)}</td>`);
 
                         // Celdas para cada día de la semana
-                        horarioData.disponibilidadPorDia.Lunes.find(b => b.bloqueId === bloque.idBloque);
-
                         for (const dia of ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"]) {
                             // Buscar disponibilidad para este bloque en este día
                             const disponibleInfo = horarioData.disponibilidadPorDia[dia].find(b => b.bloqueId === bloque.idBloque);
@@ -111,16 +162,36 @@
                                 td.addClass("bloque-asignado");
                                 const asignacion = asignaciones[0];
 
+                                // Encontrar la disponibilidad correspondiente (si existe)
+                                const disponibilidad = docenteSeleccionado.disponibilidades.find(d =>
+                                    d.diaSemana === dia && estaEnHorario(bloque.horaInicio, bloque.horaFin, d.horaInicio, d.horaFin)
+                                );
+
+                                // Añadir indicador de disponibilidad si corresponde
+                                if (disponibilidad) {
+                                    td.append(`<span class="indicador-disponibilidad bg-success text-white">D</span>`);
+                                }
+
                                 td.append(`
-                                        <div class="asignacion-item" data-id="${asignacion.id}">
-                                            <strong>${asignacion.curso.nombre}</strong><br>
-                                            <small>${asignacion.grupo.nombre} | ${asignacion.ambiente.nombre}</small>
-                                            <button class="btn btn-sm btn-danger float-end btn-borrar-asignacion"
-                                                data-id="${asignacion.id}" data-bs-toggle="tooltip" title="Eliminar">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                    `);
+                            <div class="asignacion-item" data-id="${asignacion.id}">
+                                <strong>${asignacion.curso.nombre}</strong><br>
+                                <small>${asignacion.grupo.nombre} | ${asignacion.ambiente.nombre}</small>
+                                <button class="btn btn-sm btn-danger float-end btn-borrar-asignacion"
+                                    data-id="${asignacion.id}" data-bs-toggle="tooltip" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        `);
+
+                                // Añadir tooltip con información detallada
+                                td.attr("data-bs-toggle", "tooltip");
+                                td.attr("data-bs-html", "true");
+                                td.attr("title", `
+                            <strong>Curso:</strong> ${asignacion.curso.nombre}<br>
+                            <strong>Grupo:</strong> ${asignacion.grupo.nombre}<br>
+                            <strong>Ambiente:</strong> ${asignacion.ambiente.nombre}<br>
+                            <strong>Tipo:</strong> ${asignacion.tipoSesion}
+                        `);
 
                                 // Evento para eliminar asignación
                                 td.find(".btn-borrar-asignacion").click(function(e) {
@@ -136,6 +207,28 @@
                                 td.attr("data-dia", dia);
                                 td.attr("data-bloque", bloque.idBloque);
 
+                                // Encontrar la disponibilidad correspondiente
+                                const disponibilidad = docenteSeleccionado.disponibilidades.find(d =>
+                                    d.diaSemana === dia && estaEnHorario(bloque.horaInicio, bloque.horaFin, d.horaInicio, d.horaFin)
+                                );
+
+                                // Añadir información sobre la disponibilidad como tooltip
+                                if (disponibilidad) {
+                                    td.attr("data-bs-toggle", "tooltip");
+                                    td.attr("data-bs-html", "true");
+                                    td.attr("data-bs-placement", "top");
+                                    td.attr("title", `
+                                <strong>Disponible:</strong> ${disponibilidad.horaInicio.substring(0, 5)} - ${disponibilidad.horaFin.substring(0, 5)}<br>
+                                <strong>Haga clic para asignar</strong>
+                            `);
+
+                                    // Añadir indicador visual de disponibilidad
+                                    td.append(`<i class="bi bi-check-circle-fill text-success position-absolute" style="top: 5px; right: 5px; opacity: 0.7;"></i>`);
+
+                                    // Texto indicativo para guiar al usuario
+                                    td.append(`<div class="text-center text-success" style="font-size: 12px; opacity: 0.7;">Disponible</div>`);
+                                }
+
                                 // Evento para crear nueva asignación
                                 td.click(function() {
                                     iniciarNuevaAsignacion(dia, bloque.idBloque);
@@ -143,6 +236,11 @@
                             } else {
                                 // No disponible
                                 td.addClass("bloque-nodisponible");
+
+                                // Añadir tooltip para indicar que no está disponible
+                                td.attr("data-bs-toggle", "tooltip");
+                                td.attr("data-bs-html", "true");
+                                td.attr("title", "No disponible en este horario");
                             }
 
                             tr.append(td);
@@ -151,13 +249,33 @@
                         tbody.append(tr);
                     });
 
-                    // Inicializar tooltips
-                    $('[data-bs-toggle="tooltip"]').tooltip();
+                    // Inicializar tooltips con opciones personalizadas
+                    $('[data-bs-toggle="tooltip"]').tooltip({
+                        template: '<div class="tooltip tooltip-disponibilidad" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+                    });
                 },
                 error: function() {
                     alert("Error al cargar los bloques de horario");
                 }
             });
+        }
+        // Función auxiliar para verificar si un bloque está dentro del horario de disponibilidad
+        function estaEnHorario(bloqueInicio, bloqueFin, dispInicio, dispFin) {
+            // Convertir a minutos para facilitar la comparación
+            function timeToMinutes(time) {
+                const parts = time.split(':');
+                return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+            }
+
+            const bloqueInicioMin = timeToMinutes(bloqueInicio);
+            const bloqueFinMin = timeToMinutes(bloqueFin);
+            const dispInicioMin = timeToMinutes(dispInicio);
+            const dispFinMin = timeToMinutes(dispFin);
+
+            // El bloque está dentro del horario de disponibilidad si:
+            // - La hora de inicio del bloque es >= a la hora de inicio de la disponibilidad
+            // - La hora de fin del bloque es <= a la hora de fin de la disponibilidad
+            return bloqueInicioMin >= dispInicioMin && bloqueFinMin <= dispFinMin;
         }
 
         function iniciarNuevaAsignacion(dia, bloqueId) {
@@ -310,7 +428,7 @@
                 }
             });
         });
-//segunda parte del html horarios/index.html
+
         function eliminarDisponibilidad(id) {
             $.ajax({
                 url: `/docentes/disponibilidad/${id}`,
@@ -385,9 +503,407 @@
                     $("#modalAsignacion").modal("hide");
                     // Recargar horario
                     cargarHorarioDocente(docenteSeleccionado.idDocente);
+
+                    // Mostrar mensaje de éxito
+                    mostrarAlertaGlobal("success", "La asignación ha sido creada exitosamente.");
                 },
-                error: function() {
-                    alert("Error al crear la asignación");
+                error: function(xhr) {
+                    // Verificar si es un error de límite de horas
+                    if (xhr.responseText && xhr.responseText.includes("excede el total de horas")) {
+                        mostrarModalErrorHoras(xhr.responseText);
+                    } else if (xhr.responseText) {
+                        mostrarAlertaGlobal("danger", xhr.responseText);
+                    } else {
+                        mostrarAlertaGlobal("danger", "Error al crear la asignación");
+                    }
+                }
+            });
+        }
+        // Función para mostrar un modal personalizado para errores de horas
+        function mostrarModalErrorHoras(mensaje) {
+            // Extraer datos del mensaje de error
+            const regex = /Horas ya asignadas: (\d+), Horas a asignar: (\d+), Horas semanales del curso: (\d+)/;
+            const matches = mensaje.match(regex);
+
+            let horasAsignadas = 0;
+            let horasNuevas = 0;
+            let horasTotales = 0;
+
+            if (matches && matches.length >= 4) {
+                horasAsignadas = parseInt(matches[1]);
+                horasNuevas = parseInt(matches[2]);
+                horasTotales = parseInt(matches[3]);
+            }
+
+            // Crear modal para mostrar la información de error de horas
+            const modal = `
+    <div class="modal fade" id="modalErrorHoras" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Error en la asignación de horas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>La asignación excede el total de horas semanales permitidas para este curso.</strong>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Horas totales del curso</th>
+                                <td class="text-center">${horasTotales} horas pedagógicas</td>
+                            </tr>
+                            <tr>
+                                <th>Horas ya asignadas</th>
+                                <td class="text-center">${horasAsignadas} horas pedagógicas</td>
+                            </tr>
+                            <tr>
+                                <th>Horas que intentas asignar</th>
+                                <td class="text-center">${horasNuevas} horas pedagógicas</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <th>Exceso de horas</th>
+                                <td class="text-center">${horasAsignadas + horasNuevas - horasTotales} horas pedagógicas</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <p>Por favor, reduce la cantidad de bloques seleccionados o elimina algunas asignaciones existentes para este curso.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+
+            // Eliminar modal anterior si existe
+            $("#modalErrorHoras").remove();
+
+            // Añadir el modal al DOM y mostrarlo
+            $("body").append(modal);
+            const modalEl = new bootstrap.Modal(document.getElementById('modalErrorHoras'));
+            modalEl.show();
+        }
+
+// Función para mostrar alertas globales
+        function mostrarAlertaGlobal(tipo, mensaje) {
+            const alertaHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    `;
+
+            // Insertar la alerta al principio del contenido principal
+            $("#content").prepend(alertaHTML);
+
+            // Auto-ocultar después de 5 segundos
+            setTimeout(() => {
+                $(".alert-dismissible").alert('close');
+            }, 5000);
+        }
+
+        // Actualizar el evento del curso para mostrar información de horas
+        // Modificar el evento de cambio de curso
+        $("#asignacionCurso").change(function() {
+            const cursoId = $(this).val();
+            const grupoId = $("#asignacionGrupo").val();
+
+            if (!cursoId || !grupoId) {
+                $("#infoCursoHoras").hide();
+                $("#infoTipoCurso").hide();
+                return;
+            }
+
+            // Obtener información del curso seleccionado
+            $.ajax({
+                url: `/cursos/${cursoId}`,
+                method: "GET",
+                success: function(curso) {
+                    // Mostrar información de horas
+                    // (código existente para mostrar horas...)
+
+                    // Manejar el tipo de curso
+                    switch(curso.tipo) {
+                        case "Teorico":
+                            // Si es teórico, fijar como teórica y deshabilitar cambio
+                            $("#asignacionTipoSesion").val("Teorica").prop("disabled", true);
+                            // Mostrar mensaje informativo
+                            $("#infoTipoCurso").html(`
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Este curso está definido como <strong>Teórico</strong>. La sesión será teórica.
+                            <a href="#" class="alert-link" data-bs-toggle="modal" data-bs-target="#modalCurso">Editar curso</a>
+                        </div>
+                    `).show();
+                            // Cargar ambientes teóricos
+                            cargarAmbientesPorTipo("Teorico");
+                            break;
+
+                        case "Practico":
+                            // Si es práctico, fijar como práctica y deshabilitar cambio
+                            $("#asignacionTipoSesion").val("Practica").prop("disabled", true);
+                            // Mostrar mensaje informativo
+                            $("#infoTipoCurso").html(`
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Este curso está definido como <strong>Práctico</strong>. La sesión será práctica.
+                            <a href="#" class="alert-link" data-bs-toggle="modal" data-bs-target="#modalCurso">Editar curso</a>
+                        </div>
+                    `).show();
+                            // Cargar ambientes prácticos
+                            cargarAmbientesPorTipo("Practico");
+                            break;
+
+                        case "Mixto":
+                            // Si es mixto, habilitar selección
+                            $("#asignacionTipoSesion").val("").prop("disabled", false);
+                            // Mostrar mensaje informativo
+                            $("#infoTipoCurso").html(`
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Este curso está definido como <strong>Mixto</strong>. Seleccione el tipo de sesión.
+                        </div>
+                    `).show();
+                            // Limpiar ambientes
+                            $("#asignacionAmbiente").empty().append('<option value="">Seleccione tipo de sesión primero...</option>');
+                            break;
+                    }
+                }
+            });
+        });
+
+        // Función para cargar ambientes por tipo
+        function cargarAmbientesPorTipo(tipoAmbiente) {
+            $.ajax({
+                url: `/horarios/ambientes`,
+                method: "GET",
+                data: { tipo: tipoAmbiente },
+                success: function(ambientes) {
+                    const select = $("#asignacionAmbiente");
+                    select.empty().append('<option value="">Seleccione...</option>');
+
+                    ambientes.forEach(ambiente => {
+                        select.append(new Option(`${ambiente.nombre} (Cap: ${ambiente.capacidad})`, ambiente.idAmbiente));
+                    });
+                }
+            });
+        }
+
+        // Función para mostrar información de horas del curso
+        function mostrarInformacionHorasCurso(estado, horasTotales, horasAsignadas, horasFaltantes) {
+            let alertClass = "info";
+            let mensaje = "";
+
+            if (estado === 'COMPLETO') {
+                alertClass = "success";
+                mensaje = `
+            <i class="bi bi-check-circle-fill me-2"></i>
+            Las <strong>${horasTotales} horas pedagógicas</strong> semanales de este curso
+            han sido asignadas completamente.
+        `;
+            } else if (estado === 'PARCIAL') {
+                alertClass = "warning";
+                mensaje = `
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Faltan <strong>${horasFaltantes} horas pedagógicas</strong> por asignar para completar
+            el total de <strong>${horasTotales} horas</strong> semanales de este curso.
+            Actualmente hay <strong>${horasAsignadas} horas</strong> asignadas.
+        `;
+            } else {
+                // SIN_ASIGNAR
+                alertClass = "info";
+                mensaje = `
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Este curso requiere un total de <strong>${horasTotales} horas pedagógicas</strong> semanales.
+            Aún no tiene ninguna hora asignada.
+        `;
+            }
+
+            // Mostrar la información en el contenedor
+            $("#infoCursoHoras").html(`
+        <div class="alert alert-${alertClass}">
+            ${mensaje}
+        </div>
+    `).show();
+        }
+
+// Al cambiar el grupo, verificar las horas disponibles
+        $("#asignacionGrupo").change(function() {
+            const cursoId = $("#asignacionCurso").val();
+            const grupoId = $(this).val();
+
+            if (cursoId && grupoId) {
+                verificarHorasCurso(cursoId, grupoId);
+            } else {
+                $("#infoCursoHoras").hide();
+            }
+        });
+
+// Función para verificar las horas disponibles para un curso/grupo
+        function verificarHorasCurso(cursoId, grupoId) {
+            $.ajax({
+                url: "/horarios/verificar-horas-curso",
+                method: "GET",
+                data: {
+                    cursoId: cursoId,
+                    grupoId: grupoId
+                },
+                success: function(data) {
+                    let alertClass = "info";
+                    let mensaje = "";
+
+                    if (data.horasFaltantes > 0) {
+                        alertClass = "warning";
+                        mensaje = `
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Faltan <strong>${data.horasFaltantes} horas pedagógicas</strong> por asignar para completar
+                    el total de <strong>${data.horasTotales} horas</strong> semanales de este curso.
+                `;
+                    } else if (data.horasFaltantes === 0) {
+                        alertClass = "success";
+                        mensaje = `
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    Las <strong>${data.horasTotales} horas pedagógicas</strong> semanales de este curso
+                    han sido asignadas completamente.
+                `;
+                    } else {
+                        // Caso donde se han asignado de más (no debería ocurrir con las validaciones)
+                        alertClass = "danger";
+                        mensaje = `
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    Se han asignado <strong>${data.horasAsignadas} horas pedagógicas</strong>,
+                    excediendo las <strong>${data.horasTotales} horas</strong> semanales requeridas
+                    para este curso por <strong>${-data.horasFaltantes} horas</strong>.
+                `;
+                    }
+
+                    // Mostrar la información en el contenedor
+                    $("#infoCursoHoras").html(`
+                <div class="alert alert-${alertClass}">
+                    ${mensaje}
+                </div>
+            `).show();
+
+                    // Si hay bloques seleccionados, actualizar la información con la proyección
+                    const bloqueSeleccionados = $("#asignacionBloques").val();
+                    if (bloqueSeleccionados && bloqueSeleccionados.length > 0) {
+                        calcularHorasBloquesSeleccionados(bloqueSeleccionados, data);
+                    }
+                }
+            });
+        }
+
+// Función para calcular y mostrar información sobre los bloques seleccionados
+        function calcularHorasBloquesSeleccionados(bloqueIds, dataCurso) {
+            $.ajax({
+                url: "/horarios/calcular-horas-bloques",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(bloqueIds),
+                success: function(horasBloques) {
+                    const horasRestantes = dataCurso.horasFaltantes - horasBloques;
+                    let mensaje = "";
+                    let alertClass = "info";
+
+                    if (horasRestantes > 0) {
+                        alertClass = "warning";
+                        mensaje = `
+                    Con los bloques seleccionados (${horasBloques} horas),
+                    aún faltarían <strong>${horasRestantes} horas</strong> por asignar.
+                `;
+                    } else if (horasRestantes === 0) {
+                        alertClass = "success";
+                        mensaje = `
+                    ¡Perfecto! Con los bloques seleccionados (${horasBloques} horas),
+                    completarás exactamente las horas requeridas.
+                `;
+                    } else {
+                        alertClass = "danger";
+                        mensaje = `
+                    ¡Atención! Con los bloques seleccionados (${horasBloques} horas),
+                    excederás las horas requeridas por <strong>${-horasRestantes} horas</strong>.
+                `;
+                    }
+
+                    // Añadir esta información al contenedor
+                    $("#infoBloquesSeleccionados").html(`
+                <div class="alert alert-${alertClass} mt-2">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    ${mensaje}
+                </div>
+            `).show();
+                }
+            });
+        }
+
+// Evento al cambiar la selección de bloques
+        $("#asignacionBloques").change(function() {
+            const bloqueIds = $(this).val();
+            const cursoId = $("#asignacionCurso").val();
+            const grupoId = $("#asignacionGrupo").val();
+
+            if (bloqueIds && bloqueIds.length > 0 && cursoId && grupoId) {
+                // Obtener datos del estado del curso
+                const selectedOption = $("#asignacionCurso").find('option:selected');
+                const horasTotales = selectedOption.data('horasTotales');
+                const horasAsignadas = selectedOption.data('horasAsignadas');
+                const horasFaltantes = horasTotales - horasAsignadas;
+
+                // Verificar si los bloques seleccionados son adecuados
+                calcularHorasBloquesSeleccionados(bloqueIds, {
+                    horasTotales: horasTotales,
+                    horasAsignadas: horasAsignadas,
+                    horasFaltantes: horasFaltantes
+                });
+            } else {
+                $("#infoBloquesSeleccionados").hide();
+            }
+        });
+        // Función para calcular y mostrar información sobre los bloques seleccionados
+        function calcularHorasBloquesSeleccionados(bloqueIds, dataCurso) {
+            $.ajax({
+                url: "/horarios/calcular-horas-bloques",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(bloqueIds),
+                success: function(horasBloques) {
+                    const horasRestantes = dataCurso.horasFaltantes - horasBloques;
+                    let mensaje = "";
+                    let alertClass = "info";
+
+                    if (horasRestantes > 0) {
+                        alertClass = "warning";
+                        mensaje = `
+                    Con los bloques seleccionados (${horasBloques} horas),
+                    aún faltarían <strong>${horasRestantes} horas</strong> por asignar.
+                `;
+                    } else if (horasRestantes === 0) {
+                        alertClass = "success";
+                        mensaje = `
+                    ¡Perfecto! Con los bloques seleccionados (${horasBloques} horas),
+                    completarás exactamente las horas requeridas.
+                `;
+                    } else {
+                        alertClass = "danger";
+                        mensaje = `
+                    ¡Atención! Con los bloques seleccionados (${horasBloques} horas),
+                    excederás las horas requeridas por <strong>${-horasRestantes} horas</strong>.
+                `;
+                    }
+
+                    // Añadir esta información al contenedor
+                    $("#infoBloquesSeleccionados").html(`
+                <div class="alert alert-${alertClass} mt-2">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    ${mensaje}
+                </div>
+            `).show();
                 }
             });
         }
@@ -411,6 +927,7 @@
             const modalidadId = $(this).val();
             if (!modalidadId) {
                 $("#asignacionCarrera").empty().append('<option value="">Seleccione modalidad primero...</option>').prop("disabled", true);
+                resetearSeleccionesPosteriores("asignacionCarrera");
                 return;
             }
 
@@ -427,6 +944,10 @@
                     });
 
                     select.prop("disabled", false);
+                    resetearSeleccionesPosteriores("asignacionCarrera");
+                },
+                error: function() {
+                    alert("Error al cargar las carreras");
                 }
             });
         });
@@ -435,6 +956,7 @@
             const carreraId = $(this).val();
             if (!carreraId) {
                 $("#asignacionCiclo").empty().append('<option value="">Seleccione carrera primero...</option>').prop("disabled", true);
+                resetearSeleccionesPosteriores("asignacionCiclo");
                 return;
             }
 
@@ -451,6 +973,10 @@
                     });
 
                     select.prop("disabled", false);
+                    resetearSeleccionesPosteriores("asignacionCiclo");
+                },
+                error: function() {
+                    alert("Error al cargar los ciclos");
                 }
             });
         });
@@ -458,28 +984,10 @@
         $("#asignacionCiclo").change(function() {
             const cicloId = $(this).val();
             if (!cicloId) {
-                $("#asignacionCurso, #asignacionGrupo").empty()
-                    .append('<option value="">Seleccione ciclo primero...</option>')
-                    .prop("disabled", true);
+                $("#asignacionGrupo").empty().append('<option value="">Seleccione ciclo primero...</option>').prop("disabled", true);
+                resetearSeleccionesPosteriores("asignacionGrupo");
                 return;
             }
-
-            // Cargar cursos por ciclo
-            $.ajax({
-                url: `/horarios/cursos/filtrar`,
-                method: "GET",
-                data: { cicloId: cicloId },
-                success: function(cursos) {
-                    const select = $("#asignacionCurso");
-                    select.empty().append('<option value="">Seleccione...</option>');
-
-                    cursos.forEach(curso => {
-                        select.append(new Option(curso.nombre, curso.idCurso));
-                    });
-
-                    select.prop("disabled", false);
-                }
-            });
 
             // Cargar grupos por ciclo
             $.ajax({
@@ -489,15 +997,124 @@
                     const select = $("#asignacionGrupo");
                     select.empty().append('<option value="">Seleccione...</option>');
 
-                    grupos.forEach(grupo => {
-                        select.append(new Option(grupo.nombre, grupo.idGrupo));
-                    });
+                    if (grupos.length === 0) {
+                        select.append('<option value="" disabled>No hay grupos registrados para este ciclo</option>');
+                    } else {
+                        grupos.forEach(grupo => {
+                            select.append(new Option(grupo.nombre, grupo.idGrupo));
+                        });
+                    }
 
                     select.prop("disabled", false);
+                    resetearSeleccionesPosteriores("asignacionGrupo");
+                },
+                error: function() {
+                    alert("Error al cargar los grupos");
+                }
+            });
+        });
+        $("#asignacionGrupo").change(function() {
+            const grupoId = $(this).val();
+            const cicloId = $("#asignacionCiclo").val();
+
+            if (!grupoId || !cicloId) {
+                $("#asignacionCurso").empty().append('<option value="">Seleccione grupo primero...</option>').prop("disabled", true);
+                $("#infoCursoHoras").hide();
+                return;
+            }
+
+            // Cargar cursos del ciclo con información de completado
+            $.ajax({
+                url: `/horarios/cursos/grupo/${grupoId}/ciclo/${cicloId}`,
+                method: "GET",
+                success: function(cursos) {
+                    const select = $("#asignacionCurso");
+                    select.empty().append('<option value="">Seleccione...</option>');
+
+                    if (cursos.length === 0) {
+                        select.append('<option value="" disabled>No hay cursos registrados para este ciclo</option>');
+                    } else {
+                        cursos.forEach(curso => {
+                            // Crear opción con información de estado
+                            const option = new Option(
+                                `${curso.nombre} ${getEstadoCompletadoTexto(curso.estado)}`,
+                                curso.idCurso
+                            );
+
+                            // Añadir atributos de datos para usar después
+                            $(option).data('estado', curso.estado);
+                            $(option).data('horasTotales', curso.horasSemana);
+                            $(option).data('horasAsignadas', curso.horasAsignadas);
+
+                            // Colorear según estado
+                            if (curso.estado === 'COMPLETO') {
+                                $(option).addClass('text-success');
+                            } else if (curso.estado === 'PARCIAL') {
+                                $(option).addClass('text-warning');
+                            } else {
+                                $(option).addClass('text-danger'); // Sin asignar
+                            }
+
+                            select.append(option);
+                        });
+                    }
+
+                    select.prop("disabled", false);
+                },
+                error: function() {
+                    alert("Error al cargar los cursos");
                 }
             });
         });
 
+// Función para obtener texto descriptivo del estado de completado
+        function getEstadoCompletadoTexto(estado) {
+            switch(estado) {
+                case 'COMPLETO':
+                    return '✓ (Completado)';
+                case 'PARCIAL':
+                    return '⚠ (Parcial)';
+                case 'SIN_ASIGNAR':
+                    return '⚠ (Por asignar)';
+                default:
+                    return '';
+            }
+        }
+        // Función para resetear selecciones posteriores a un campo
+        function resetearSeleccionesPosteriores(campoActual) {
+            const campos = ["asignacionModalidad", "asignacionCarrera", "asignacionCiclo", "asignacionGrupo", "asignacionCurso"];
+            const indiceActual = campos.indexOf(campoActual);
+
+            if (indiceActual >= 0) {
+                for (let i = indiceActual + 1; i < campos.length; i++) {
+                    const campo = campos[i];
+                    let placeholder = "Seleccione...";
+
+                    switch(campo) {
+                        case "asignacionCarrera":
+                            placeholder = "Seleccione modalidad primero...";
+                            break;
+                        case "asignacionCiclo":
+                            placeholder = "Seleccione carrera primero...";
+                            break;
+                        case "asignacionGrupo":
+                            placeholder = "Seleccione ciclo primero...";
+                            break;
+                        case "asignacionCurso":
+                            placeholder = "Seleccione grupo primero...";
+                            break;
+                    }
+
+                    $(`#${campo}`).empty().append(`<option value="">${placeholder}</option>`).prop("disabled", true);
+                }
+            }
+
+            // Ocultar información de horas
+            $("#infoCursoHoras, #infoBloquesSeleccionados").hide();
+        }
+
+
+// Modificar el evento de cambio de tipo de sesión para solo activarse cuando el curso es mixto
         $("#asignacionTipoSesion").change(function() {
             const tipoSesion = $(this).val();
             if (!tipoSesion) {
@@ -506,28 +1123,15 @@
             }
 
             const tipoAmbiente = tipoSesion === "Teorica" ? "Teorico" : "Practico";
-
-            // Cargar ambientes por tipo
-            $.ajax({
-                url: `/horarios/ambientes`,
-                method: "GET",
-                data: { tipo: tipoAmbiente },
-                success: function(ambientes) {
-                    const select = $("#asignacionAmbiente");
-                    select.empty().append('<option value="">Seleccione...</option>');
-
-                    ambientes.forEach(ambiente => {
-                        select.append(new Option(`${ambiente.nombre} (Cap: ${ambiente.capacidad})`, ambiente.idAmbiente));
-                    });
-                }
-            });
+            cargarAmbientesPorTipo(tipoAmbiente);
         });
 
-        // Inicializar gestión de cursos
+        // Evento al cambiar el filtro de modalidad
         $("#filtroCursoModalidad").change(function() {
             cargarCursos();
         });
 
+        // Añadir código para manejar la edición de cursos
         function cargarCursos() {
             const modalidadId = $("#filtroCursoModalidad").val();
             const filtros = { modalidadId: modalidadId || null };
@@ -552,13 +1156,22 @@
                         tr.append(`<td>${curso.carreraNombre}</td>`);
                         tr.append(`<td>${curso.tipo}</td>`);
                         tr.append(`
-                                <td>
-                                    <button class="btn btn-sm btn-danger btn-eliminar-curso" data-id="${curso.idCurso}">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            `);
+                    <td>
+                        <button class="btn btn-sm btn-warning btn-editar-curso me-1" data-id="${curso.idCurso}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-eliminar-curso" data-id="${curso.idCurso}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `);
                         tbody.append(tr);
+                    });
+
+                    // Evento para editar curso
+                    $(".btn-editar-curso").click(function() {
+                        const cursoId = $(this).data("id");
+                        cargarCursoParaEditar(cursoId);
                     });
 
                     // Evento para eliminar curso
@@ -566,6 +1179,49 @@
                         const cursoId = $(this).data("id");
                         if (confirm("¿Está seguro de eliminar este curso?")) {
                             eliminarCurso(cursoId);
+                        }
+                    });
+                }
+            });
+        }
+        // Función para cargar un curso para editar
+        function cargarCursoParaEditar(cursoId) {
+            $.ajax({
+                url: `/cursos/${cursoId}`,
+                method: "GET",
+                success: function(curso) {
+                    // Guardar el ID del curso para actualizar
+                    $("#cursoId").val(curso.idCurso);
+
+                    // Obtener información de ciclo, carrera y modalidad
+                    $.ajax({
+                        url: `/cursos/ciclos/${curso.cicloId}`,
+                        method: "GET",
+                        success: function(ciclo) {
+                            // Seleccionar modalidad
+                            $("#cursoModalidad").val(ciclo.carrera.modalidad.idModalidad).trigger("change");
+
+                            // Cuando la carrera se haya cargado, seleccionarla
+                            setTimeout(function() {
+                                $("#cursoCarrera").val(ciclo.carrera.idCarrera).trigger("change");
+
+                                // Cuando el ciclo se haya cargado, seleccionarlo
+                                setTimeout(function() {
+                                    $("#cursoCiclo").val(ciclo.idCiclo);
+
+                                    // Completar el resto de datos del formulario
+                                    $("#cursoNombre").val(curso.nombre);
+                                    $("#cursoTipo").val(curso.tipo);
+                                    $("#cursoHoras").val(curso.horasSemana);
+
+                                    // Cambiar el texto del botón y título
+                                    $("#btnGuardarCurso").text("Actualizar Curso");
+                                    $("#nuevoCursoTitle").text("Editar Curso");
+
+                                    // Mostrar la pestaña de formulario
+                                    $("#nuevo-curso-tab").tab("show");
+                                }, 300);
+                            }, 300);
                         }
                     });
                 }
@@ -949,6 +1605,7 @@
         cargarCiclos();
     });
     // Agregar este código en el script para manejar el modal de cursos
+    // Estos eventos ya deberían existir pero los incluyo para completitud
     $("#cursoModalidad").change(function() {
         const modalidadId = $(this).val();
         if (!modalidadId) {
@@ -969,12 +1626,10 @@
                 });
 
                 select.prop("disabled", false);
-            },
-            error: function() {
-                alert("Error al cargar las carreras");
             }
         });
     });
+
 
     // De manera similar, añadiremos el evento para cuando se selecciona una carrera
     $("#cursoCarrera").change(function() {
@@ -997,15 +1652,14 @@
                 });
 
                 select.prop("disabled", false);
-            },
-            error: function() {
-                alert("Error al cargar los ciclos");
             }
         });
     });
 
-    // Funcionalidad para guardar un nuevo curso
+    // Modificar la función para guardar/actualizar curso
+    // Función para guardar o actualizar un curso
     $("#btnGuardarCurso").click(function() {
+        const id = $("#cursoId").val();
         const cicloId = $("#cursoCiclo").val();
         const nombre = $("#cursoNombre").val();
         const tipo = $("#cursoTipo").val();
@@ -1022,33 +1676,58 @@
             horasSemana: parseInt(horas)
         };
 
+        let url = `/cursos?cicloId=${cicloId}`;
+        let method = "POST";
+
+        // Si hay ID, es una actualización
+        if (id) {
+            url = `/cursos/${id}?cicloId=${cicloId}`;
+            method = "PUT";
+            cursoDTO.idCurso = parseInt(id);
+        }
+
         $.ajax({
-            url: `/cursos?cicloId=${cicloId}`,
-            method: "POST",
+            url: url,
+            method: method,
             contentType: "application/json",
             data: JSON.stringify(cursoDTO),
             success: function(curso) {
                 // Limpiar el formulario
-                $("#formCurso")[0].reset();
-                $("#cursoCarrera, #cursoCiclo").prop("disabled", true);
+                resetearFormularioCurso();
 
-                // Cambiar a la pestaña de lista y recargar la tabla de cursos
+                // Cambiar a la pestaña de lista y recargar
                 $("#lista-cursos-tab").tab("show");
                 cargarCursos();
 
-                alert("Curso guardado con éxito");
+                alert(id ? "Curso actualizado con éxito" : "Curso guardado con éxito");
             },
             error: function(xhr) {
                 if (xhr.status === 400) {
                     alert("Error: Ya existe un curso con ese nombre en el mismo ciclo");
                 } else {
-                    alert("Error al guardar el curso");
+                    alert("Error al " + (id ? "actualizar" : "guardar") + " el curso");
                 }
             }
         });
     });
+    // Función para resetear el formulario de curso
+    function resetearFormularioCurso() {
+        $("#cursoId").val("");
+        $("#formCurso")[0].reset();
+        $("#cursoCarrera, #cursoCiclo").prop("disabled", true);
+        $("#btnGuardarCurso").text("Guardar Curso");
+        $("#nuevoCursoTitle").text("Nuevo Curso");
+    }
+
+
+
+    // Evento al hacer clic en "Nuevo" (para asegurarnos de resetear el formulario)
+    $("#nuevo-curso-tab").on('shown.bs.tab', function() {
+        resetearFormularioCurso();
+    });
 
     // Cargar cursos en la tabla
+    // Cargar cursos
     function cargarCursos() {
         const modalidadId = $("#filtroCursoModalidad").val();
         const filtros = { modalidadId: modalidadId || null };
@@ -1074,12 +1753,21 @@
                     tr.append(`<td>${curso.tipo}</td>`);
                     tr.append(`
                     <td>
+                        <button class="btn btn-sm btn-warning btn-editar-curso me-1" data-id="${curso.idCurso}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
                         <button class="btn btn-sm btn-danger btn-eliminar-curso" data-id="${curso.idCurso}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
                 `);
                     tbody.append(tr);
+                });
+
+                // Evento para editar curso
+                $(".btn-editar-curso").click(function() {
+                    const cursoId = $(this).data("id");
+                    cargarCursoParaEditar(cursoId);
                 });
 
                 // Evento para eliminar curso
@@ -1089,12 +1777,17 @@
                         eliminarCurso(cursoId);
                     }
                 });
-            },
-            error: function() {
-                alert("Error al cargar los cursos");
             }
         });
     }
+    // Evento al hacer clic en "Cancelar"
+    $("#btnCancelarCurso").click(function() {
+        resetearFormularioCurso();
+        $("#lista-cursos-tab").tab("show");
+    });
+
+
+
 
     // Función para eliminar un curso
     function eliminarCurso(id) {
@@ -1114,10 +1807,62 @@
             }
         });
     }
+    // Función para cargar un curso para editar
+    function cargarCursoParaEditar(cursoId) {
+        $.ajax({
+            url: `/cursos/${cursoId}`,
+            method: "GET",
+            success: function(curso) {
+                // Guardar el ID del curso para actualizar
+                $("#cursoId").val(curso.idCurso);
 
+                // Actualizar el título
+                $("#nuevoCursoTitle").text("Editar Curso");
+
+                // Cargar información del ciclo para obtener carrera y modalidad
+                $.ajax({
+                    url: `/cursos/ciclo/${curso.cicloId}`,
+                    method: "GET",
+                    success: function(cicloData) {
+                        // Seleccionar modalidad
+                        $("#cursoModalidad").val(cicloData.modalidadId).trigger("change");
+
+                        // Esperar a que se carguen las carreras y seleccionar
+                        setTimeout(function() {
+                            $("#cursoCarrera").val(cicloData.carreraId).trigger("change");
+
+                            // Esperar a que se carguen los ciclos y seleccionar
+                            setTimeout(function() {
+                                $("#cursoCiclo").val(curso.cicloId);
+
+                                // Completar el resto de campos
+                                $("#cursoNombre").val(curso.nombre);
+                                $("#cursoTipo").val(curso.tipo);
+                                $("#cursoHoras").val(curso.horasSemana);
+
+                                // Cambiar el texto del botón
+                                $("#btnGuardarCurso").text("Actualizar Curso");
+
+                                // Mostrar la pestaña de edición
+                                $("#nuevo-curso-tab").tab("show");
+                            }, 300);
+                        }, 300);
+                    },
+                    error: function() {
+                        alert("Error al cargar los datos del ciclo");
+                    }
+                });
+            },
+            error: function() {
+                alert("Error al cargar el curso para editar");
+            }
+        });
+    }
     // Cargar la lista de cursos al abrir el modal
+    // Cargar cursos al abrir el modal
     $("#modalCurso").on('shown.bs.modal', function() {
         cargarCursos();
+        resetearFormularioCurso();
     });
     // Gestión de grupos - Código a agregar a tu archivo JavaScript principal
 

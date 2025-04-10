@@ -7,6 +7,7 @@
             </div>
             <div class="modal-body">
                 <form id="formAsignacion" class="row g-3">
+                    <div id="infoTipoCurso" class="mt-3" style="display: none;"></div>
                     <input type="hidden" id="asignacionDocenteId">
 
                     <div class="col-md-6">
@@ -25,6 +26,7 @@
                         <small class="form-text text-muted">Ctrl+Click para seleccionar múltiples bloques consecutivos</small>
                     </div>
 
+                    <!-- Reordenamos los campos para seguir la jerarquía: Modalidad -> Carrera -> Ciclo -> Grupo -> Curso -->
                     <div class="col-md-4">
                         <label for="asignacionModalidad" class="form-label">Modalidad</label>
                         <select class="form-select" id="asignacionModalidad">
@@ -48,16 +50,16 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="asignacionCurso" class="form-label">Curso</label>
-                        <select class="form-select" id="asignacionCurso" required disabled>
+                        <label for="asignacionGrupo" class="form-label">Grupo</label>
+                        <select class="form-select" id="asignacionGrupo" required disabled>
                             <option value="">Seleccione ciclo primero...</option>
                         </select>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="asignacionGrupo" class="form-label">Grupo</label>
-                        <select class="form-select" id="asignacionGrupo" required disabled>
-                            <option value="">Seleccione ciclo primero...</option>
+                        <label for="asignacionCurso" class="form-label">Curso</label>
+                        <select class="form-select" id="asignacionCurso" required disabled>
+                            <option value="">Seleccione grupo primero...</option>
                         </select>
                     </div>
 
@@ -73,11 +75,12 @@
                     <div class="col-md-6">
                         <label for="asignacionAmbiente" class="form-label">Ambiente</label>
                         <select class="form-select" id="asignacionAmbiente" required>
-                            <option value="">Seleccione...</option>
-                            <!-- Se llenará con JavaScript según el tipo de sesión -->
+                            <option value="">Seleccione tipo de sesión primero...</option>
                         </select>
                     </div>
                 </form>
+                <div id="infoCursoHoras" class="mt-3" style="display: none;"></div>
+                <div id="infoBloquesSeleccionados" class="mt-2" style="display: none;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

@@ -158,7 +158,7 @@ public class AsignacionHorarioService {
     }
 
     /**
-     * Crea una nueva asignación de horario
+     * Modifica el método crearAsignacionHorario para validar las horas
      */
     @Transactional
     public AsignacionHorarioResponseDTO crearAsignacionHorario(AsignacionHorarioRequestDTO requestDTO) {
@@ -179,7 +179,18 @@ public class AsignacionHorarioService {
         Grupo grupo = grupoOpt.get();
         Ambiente ambiente = ambienteOpt.get();
         DisponibilidadDocente.DiaSemana diaSemana = requestDTO.getDiaSemana();
+        AsignacionHorario.TipoSesion tipoSesion = requestDTO.getTipoSesion();
         List<Long> bloqueIds = requestDTO.getBloqueIds();
+
+        // Verificar que el tipo de sesión sea compatible con el tipo de curso
+        if (curso.getTipo() == Curso.TipoCurso.Teorico && tipoSesion != AsignacionHorario.TipoSesion.Teorica) {
+            throw new IllegalArgumentException("El curso es teórico y solo admite sesiones teóricas");
+        }
+
+        if (curso.getTipo() == Curso.TipoCurso.Practico && tipoSesion != AsignacionHorario.TipoSesion.Practica) {
+            throw new IllegalArgumentException("El curso es práctico y solo admite sesiones prácticas");
+        }
+
 
         // Verificar disponibilidad del docente
         if (!verificarDisponibilidadDocente(docente.getIdDocente(), diaSemana, bloqueIds)) {
@@ -202,29 +213,32 @@ public class AsignacionHorarioService {
             return null;
         }
 
-        // Verificar coherencia con el tipo de ambiente y curso
-        boolean esCompatible = (curso.getTipo() == Curso.TipoCurso.Teorico && ambiente.getTipo() == Ambiente.TipoAmbiente.Teorico) ||
-                (curso.getTipo() == Curso.TipoCurso.Practico && ambiente.getTipo() == Ambiente.TipoAmbiente.Practico) ||
-                (curso.getTipo() == Curso.TipoCurso.Mixto);
+        // Verificar coherencia con el tipo de ambiente y sesión
+        boolean esCompatible = (tipoSesion == AsignacionHorario.TipoSesion.Teorica && ambiente.getTipo() == Ambiente.TipoAmbiente.Teorico) ||
+                (tipoSesion == AsignacionHorario.TipoSesion.Practica && ambiente.getTipo() == Ambiente.TipoAmbiente.Practico);
 
         if (!esCompatible) {
-            return null;
+            throw new IllegalArgumentException("El tipo de ambiente no es compatible con el tipo de sesión");
         }
 
-        // NUEVA VALIDACIÓN: Verificar horas asignadas vs horas requeridas
+        // VALIDACIÓN DE HORAS: Verificar que no se exceda el total de horas semanales
         int horasYaAsignadas = calcularHorasAsignadas(curso.getIdCurso(), grupo.getIdGrupo());
-        int horasNuevaAsignacion = 0;
 
-        // Calcular cuántas horas pedagógicas representan los bloques seleccionados
+        // Calcular las horas de la nueva asignación
+        int totalMinutosNuevos = 0;
         for (BloqueHorario bloque : bloques) {
-            horasNuevaAsignacion += bloque.getDuracion() / 45; // Convertir minutos a horas pedagógicas
+            totalMinutosNuevos += bloque.getDuracion();
         }
+        int horasNuevaAsignacion = totalMinutosNuevos / 45;
 
-        // Verificar que no se exceda el total de horas semanales del curso
+        // Verificar que no se exceda el límite
         if (horasYaAsignadas + horasNuevaAsignacion > curso.getHorasSemana()) {
-            throw new IllegalStateException("La asignación excede el total de horas semanales permitidas para este curso. " +
-                    "Horas ya asignadas: " + horasYaAsignadas + ", Horas a asignar: " + horasNuevaAsignacion +
-                    ", Horas semanales del curso: " + curso.getHorasSemana());
+            throw new IllegalStateException(
+                    "La asignación excede el total de horas semanales permitidas para este curso. " +
+                            "Horas ya asignadas: " + horasYaAsignadas + ", " +
+                            "Horas a asignar: " + horasNuevaAsignacion + ", " +
+                            "Horas semanales del curso: " + curso.getHorasSemana()
+            );
         }
 
         // Crear asignación
@@ -368,26 +382,30 @@ public class AsignacionHorarioService {
     /**
      * Calcula las horas pedagógicas ya asignadas para un curso y grupo específico
      */
-    private int calcularHorasAsignadas(Long cursoId, Long grupoId) {
-        // Obtener todas las asignaciones para este curso y grupo
-        Curso curso = cursoRepository.findById(cursoId).orElse(null);
-        Grupo grupo = grupoRepository.findById(grupoId).orElse(null);
+    public int calcularHorasAsignadas(Long cursoId, Long grupoId) {
+        // Obtener las entidades
+        Optional<Curso> cursoOpt = cursoRepository.findById(cursoId);
+        Optional<Grupo> grupoOpt = grupoRepository.findById(grupoId);
 
-        if (curso == null || grupo == null) {
+        if (!cursoOpt.isPresent() || !grupoOpt.isPresent()) {
             return 0;
         }
 
+        Curso curso = cursoOpt.get();
+        Grupo grupo = grupoOpt.get();
+
+        // Buscar todas las asignaciones para este curso y grupo
         List<AsignacionHorario> asignaciones = asignacionRepository.findByCursoAndGrupo(curso, grupo);
 
-        // Calcular la duración total en minutos de todos los bloques asignados
+        // Calcular la duración total en minutos
         int totalMinutos = 0;
         for (AsignacionHorario asignacion : asignaciones) {
             for (BloqueHorario bloque : asignacion.getBloques()) {
-                totalMinutos += bloque.getDuracion(); // La duración está en minutos
+                totalMinutos += bloque.getDuracion();
             }
         }
 
-        // Convertir minutos a horas pedagógicas (cada hora pedagógica es 45 minutos)
+        // Convertir minutos a horas pedagógicas (45 minutos cada una)
         return totalMinutos / 45;
     }
 

@@ -42,7 +42,11 @@
             </div>
           </div>
           <div class="tab-pane fade p-3" id="nuevo-curso" role="tabpanel">
+            <h5 id="nuevoCursoTitle">Nuevo Curso</h5>
             <form id="formCurso" class="row g-3">
+              <!-- Campo oculto para el ID del curso en edición -->
+              <input type="hidden" id="cursoId" value="">
+
               <div class="col-md-6">
                 <label for="cursoModalidad" class="form-label">Modalidad</label>
                 <select class="form-select" id="cursoModalidad" required>
@@ -80,6 +84,7 @@
                 <input type="number" class="form-control" id="cursoHoras" min="1" max="20" required>
               </div>
               <div class="col-md-12 text-end">
+                <button type="button" class="btn btn-secondary me-2" id="btnCancelarCurso">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="btnGuardarCurso">Guardar Curso</button>
               </div>
             </form>
