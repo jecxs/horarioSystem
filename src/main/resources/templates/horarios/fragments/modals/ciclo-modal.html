@@ -1,0 +1,56 @@
+<div th:fragment="modal" class="modal fade" id="modalCiclo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestionar Ciclos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para crear ciclos -->
+                <form id="formCiclo" class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="cicloModalidad" class="form-label">Modalidad</label>
+                        <select class="form-select" id="cicloModalidad" required>
+                            <option value="">Seleccione...</option>
+                            <!-- Se llenará con JavaScript -->
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="cicloCarrera" class="form-label">Carrera</label>
+                        <select class="form-select" id="cicloCarrera" required disabled>
+                            <option value="">Seleccione modalidad primero...</option>
+                            <!-- Se llenará con JavaScript -->
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="cicloNumero" class="form-label">Número de Ciclo</label>
+                        <input type="number" class="form-control" id="cicloNumero" min="1" max="12" required>
+                    </div>
+                    <div class="col-md-12 text-end">
+                        <button type="button" class="btn btn-primary" id="btnGuardarCiclo">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Tabla de ciclos -->
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tablaCiclos">
+                        <thead>
+                        <tr>
+                            <th>Ciclo</th>
+                            <th>Carrera</th>
+                            <th>Modalidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Se llenará con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

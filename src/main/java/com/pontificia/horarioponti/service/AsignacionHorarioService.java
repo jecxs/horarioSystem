@@ -125,14 +125,20 @@ public class AsignacionHorarioService {
         }
         Docente docente = docenteOpt.get();
 
-        // Verificar disponibilidad para el horario completo
-        List<DisponibilidadDocente> disponibilidades = disponibilidadRepository
-                .findByDocenteAndDiaSemanaAndHoraInicioLessThanEqualAndHoraFinGreaterThanEqual(
-                        docente, diaSemana, horaInicio, horaFin);
+        // En lugar de usar el método del repositorio que está causando el error,
+        // obtenemos primero todas las disponibilidades para el día y luego filtramos manualmente
+        List<DisponibilidadDocente> disponibilidadesDia = disponibilidadRepository
+                .findByDocenteAndDiaSemana(docente, diaSemana);
 
-        return !disponibilidades.isEmpty();
+        // Verificar que al menos una disponibilidad cubra todo el rango requerido
+        boolean disponible = disponibilidadesDia.stream()
+                .anyMatch(disp ->
+                        (disp.getHoraInicio().compareTo(horaInicio) <= 0 &&
+                                disp.getHoraFin().compareTo(horaFin) >= 0)
+                );
+
+        return disponible;
     }
-
     /**
      * Verifica si un ambiente está disponible para los bloques solicitados
      */
@@ -203,6 +209,22 @@ public class AsignacionHorarioService {
 
         if (!esCompatible) {
             return null;
+        }
+
+        // NUEVA VALIDACIÓN: Verificar horas asignadas vs horas requeridas
+        int horasYaAsignadas = calcularHorasAsignadas(curso.getIdCurso(), grupo.getIdGrupo());
+        int horasNuevaAsignacion = 0;
+
+        // Calcular cuántas horas pedagógicas representan los bloques seleccionados
+        for (BloqueHorario bloque : bloques) {
+            horasNuevaAsignacion += bloque.getDuracion() / 45; // Convertir minutos a horas pedagógicas
+        }
+
+        // Verificar que no se exceda el total de horas semanales del curso
+        if (horasYaAsignadas + horasNuevaAsignacion > curso.getHorasSemana()) {
+            throw new IllegalStateException("La asignación excede el total de horas semanales permitidas para este curso. " +
+                    "Horas ya asignadas: " + horasYaAsignadas + ", Horas a asignar: " + horasNuevaAsignacion +
+                    ", Horas semanales del curso: " + curso.getHorasSemana());
         }
 
         // Crear asignación
@@ -342,6 +364,31 @@ public class AsignacionHorarioService {
                 disponibilidad.getHoraInicio(),
                 disponibilidad.getHoraFin()
         );
+    }
+    /**
+     * Calcula las horas pedagógicas ya asignadas para un curso y grupo específico
+     */
+    private int calcularHorasAsignadas(Long cursoId, Long grupoId) {
+        // Obtener todas las asignaciones para este curso y grupo
+        Curso curso = cursoRepository.findById(cursoId).orElse(null);
+        Grupo grupo = grupoRepository.findById(grupoId).orElse(null);
+
+        if (curso == null || grupo == null) {
+            return 0;
+        }
+
+        List<AsignacionHorario> asignaciones = asignacionRepository.findByCursoAndGrupo(curso, grupo);
+
+        // Calcular la duración total en minutos de todos los bloques asignados
+        int totalMinutos = 0;
+        for (AsignacionHorario asignacion : asignaciones) {
+            for (BloqueHorario bloque : asignacion.getBloques()) {
+                totalMinutos += bloque.getDuracion(); // La duración está en minutos
+            }
+        }
+
+        // Convertir minutos a horas pedagógicas (cada hora pedagógica es 45 minutos)
+        return totalMinutos / 45;
     }
 
     /**

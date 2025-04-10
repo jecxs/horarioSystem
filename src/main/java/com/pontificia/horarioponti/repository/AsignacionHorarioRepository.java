@@ -36,4 +36,6 @@ public interface AsignacionHorarioRepository extends JpaRepository<AsignacionHor
             "JOIN a.bloques b WHERE a.grupo.idGrupo = :grupoId AND a.diaSemana = :diaSemana " +
             "AND b.idBloque IN :bloqueIds")
     boolean existsConflictoGrupoEnBloques(Long grupoId, DisponibilidadDocente.DiaSemana diaSemana, List<Long> bloqueIds);
+
+    List<AsignacionHorario> findByCursoAndGrupo(Curso curso, Grupo grupo);
 }

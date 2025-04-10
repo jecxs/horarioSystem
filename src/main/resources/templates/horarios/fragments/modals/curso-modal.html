@@ -1,0 +1,94 @@
+<div th:fragment="modal" class="modal fade" id="modalCurso" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Gestionar Cursos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs" id="cursoTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="lista-cursos-tab" data-bs-toggle="tab" data-bs-target="#lista-cursos" type="button" role="tab">Lista</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nuevo-curso-tab" data-bs-toggle="tab" data-bs-target="#nuevo-curso" type="button" role="tab">Nuevo</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="cursoTabContent">
+          <div class="tab-pane fade show active p-3" id="lista-cursos" role="tabpanel">
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <select class="form-select" id="filtroCursoModalidad">
+                  <option value="">Todas las modalidades</option>
+                  <option th:each="modalidad : ${modalidades}" th:value="${modalidad.idModalidad}" th:text="${modalidad.nombre}"></option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-striped" id="tablaCursos">
+                <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Ciclo</th>
+                  <th>Carrera</th>
+                  <th>Tipo</th>
+                  <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Se llenará con JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane fade p-3" id="nuevo-curso" role="tabpanel">
+            <form id="formCurso" class="row g-3">
+              <div class="col-md-6">
+                <label for="cursoModalidad" class="form-label">Modalidad</label>
+                <select class="form-select" id="cursoModalidad" required>
+                  <option value="">Seleccione...</option>
+                  <option th:each="modalidad : ${modalidades}" th:value="${modalidad.idModalidad}" th:text="${modalidad.nombre}"></option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="cursoCarrera" class="form-label">Carrera</label>
+                <select class="form-select" id="cursoCarrera" required disabled>
+                  <option value="">Seleccione modalidad primero...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="cursoCiclo" class="form-label">Ciclo</label>
+                <select class="form-select" id="cursoCiclo" required disabled>
+                  <option value="">Seleccione carrera primero...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="cursoNombre" class="form-label">Nombre del Curso</label>
+                <input type="text" class="form-control" id="cursoNombre" required>
+              </div>
+              <div class="col-md-6">
+                <label for="cursoTipo" class="form-label">Tipo de Curso</label>
+                <select class="form-select" id="cursoTipo" required>
+                  <option value="">Seleccione...</option>
+                  <option value="Teorico">Teórico</option>
+                  <option value="Practico">Práctico</option>
+                  <option value="Mixto">Mixto</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="cursoHoras" class="form-label">Horas Semanales (Pedagógicas)</label>
+                <input type="number" class="form-control" id="cursoHoras" min="1" max="20" required>
+              </div>
+              <div class="col-md-12 text-end">
+                <button type="button" class="btn btn-primary" id="btnGuardarCurso">Guardar Curso</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

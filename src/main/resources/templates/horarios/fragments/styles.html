@@ -1,0 +1,30 @@
+<style th:fragment="styles">
+    .horario-tabla {
+        table-layout: fixed;
+    }
+    .horario-tabla th, .horario-tabla td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 0.3rem;
+    }
+    .bloque-disponible {
+        background-color: #e7f5e7;
+        cursor: pointer;
+    }
+    .bloque-nodisponible {
+        background-color: #f5e7e7;
+    }
+    .bloque-asignado {
+        background-color: #e7eef5;
+        cursor: pointer;
+    }
+    .asignacion-item {
+        padding: 5px;
+        border-radius: 4px;
+        margin-bottom: 3px;
+    }
+    .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>

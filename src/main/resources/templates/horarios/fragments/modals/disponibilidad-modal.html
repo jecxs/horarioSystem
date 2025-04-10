@@ -1,0 +1,55 @@
+<div th:fragment="modal" class="modal fade" id="modalDisponibilidad" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestionar Disponibilidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <form id="formDisponibilidad" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="diaSemana" class="form-label">Día</label>
+                                <select class="form-select" id="diaSemana" required>
+                                    <option value="">Seleccione...</option>
+                                    <option th:each="dia : ${diasSemana}" th:value="${dia}" th:text="${dia}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="horaInicio" class="form-label">Hora Inicio</label>
+                                <input type="time" class="form-control" id="horaInicio" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="horaFin" class="form-label">Hora Fin</label>
+                                <input type="time" class="form-control" id="horaFin" required>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary" id="btnAgregarDisponibilidad">Agregar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tablaDisponibilidad">
+                        <thead>
+                        <tr>
+                            <th>Día</th>
+                            <th>Hora Inicio</th>
+                            <th>Hora Fin</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Se llenará con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

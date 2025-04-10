@@ -1,5 +1,6 @@
 package com.pontificia.horarioponti.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +30,7 @@ public class Ambiente {
     private Integer capacidad;
 
     @OneToMany(mappedBy = "ambiente")
+    @JsonIgnore
     private List<AsignacionHorario> asignaciones;
 
     public enum TipoAmbiente {

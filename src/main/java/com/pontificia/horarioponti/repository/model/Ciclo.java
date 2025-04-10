@@ -1,5 +1,6 @@
 package com.pontificia.horarioponti.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,8 +27,10 @@ public class Ciclo {
     private Carrera carrera;
 
     @OneToMany(mappedBy = "ciclo", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Curso> cursos;
 
     @OneToMany(mappedBy = "ciclo", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Grupo> grupos;
 }

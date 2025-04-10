@@ -175,12 +175,19 @@ public class HorarioService {
         }
         Docente docente = docenteOpt.get();
 
-        // Verificar disponibilidad para el horario completo
-        List<DisponibilidadDocente> disponibilidades = disponibilidadRepository
-                .findByDocenteAndDiaSemanaAndHoraInicioLessThanEqualAndHoraFinGreaterThanEqual(
-                        docente, diaSemana, horaFin, horaInicio);
+        // En lugar de usar el método del repositorio que está causando el error,
+        // obtenemos primero todas las disponibilidades para el día y luego filtramos manualmente
+        List<DisponibilidadDocente> disponibilidadesDia = disponibilidadRepository
+                .findByDocenteAndDiaSemana(docente, diaSemana);
 
-        return !disponibilidades.isEmpty();
+        // Verificar que al menos una disponibilidad cubra todo el rango requerido
+        boolean disponible = disponibilidadesDia.stream()
+                .anyMatch(disp ->
+                        (disp.getHoraInicio().compareTo(horaInicio) <= 0 &&
+                                disp.getHoraFin().compareTo(horaFin) >= 0)
+                );
+
+        return disponible;
     }
 
     /**

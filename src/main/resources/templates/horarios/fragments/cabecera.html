@@ -1,0 +1,57 @@
+<div th:fragment="cabecera">
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <h2>Tablero de Horarios</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" id="btnCrearDocente" data-bs-toggle="modal" data-bs-target="#modalDocente">
+                <i class="bi bi-person-plus"></i> Nuevo Docente
+            </button>
+            <div class="btn-group">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+                    <i class="bi bi-gear"></i> Configuración
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalModalidad">Modalidades</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalCarrera">Carreras</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalCiclo">Ciclos</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalGrupo">Grupos</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalCurso">Cursos</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalTurno">Turnos</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalBloque">Bloques</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalAmbiente">Ambientes</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selector de docente -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text">Docente</span>
+                <select class="form-select" id="selectDocente">
+                    <option value="">Seleccione un docente...</option>
+                    <option th:each="docente : ${docentes}" th:value="${docente.idDocente}" th:text="${docente.nombreCompleto}"></option>
+                </select>
+                <button class="btn btn-primary" id="btnVerHorario">
+                    <i class="bi bi-calendar3"></i> Ver Horario
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6" id="infoDocente" style="display: none;">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title" id="nombreDocente"></h5>
+                    <p class="card-text" id="especialidadDocente"></p>
+                    <button class="btn btn-sm btn-outline-primary" id="btnDisponibilidad" data-bs-toggle="modal" data-bs-target="#modalDisponibilidad">
+                        <i class="bi bi-clock"></i> Gestionar Disponibilidad
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

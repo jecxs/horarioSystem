@@ -1,5 +1,6 @@
 package com.pontificia.horarioponti.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,5 +30,6 @@ public class Turno {
     private LocalTime horaFin;
 
     @OneToMany(mappedBy = "turno", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<BloqueHorario> bloques;
 }
