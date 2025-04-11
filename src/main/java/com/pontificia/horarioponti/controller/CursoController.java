@@ -2,9 +2,12 @@ package com.pontificia.horarioponti.controller;
 
 import com.pontificia.horarioponti.dtos.CursoDTO;
 import com.pontificia.horarioponti.dtos.GrupoDTO;
+import com.pontificia.horarioponti.repository.CarreraRepository;
 import com.pontificia.horarioponti.repository.CicloRepository;
+import com.pontificia.horarioponti.repository.CursoRepository;
 import com.pontificia.horarioponti.repository.model.Carrera;
 import com.pontificia.horarioponti.repository.model.Ciclo;
+import com.pontificia.horarioponti.repository.model.Curso;
 import com.pontificia.horarioponti.repository.model.ModalidadEducativa;
 import com.pontificia.horarioponti.service.CarreraService;
 import com.pontificia.horarioponti.service.CursoService;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/cursos")
@@ -31,6 +35,13 @@ public class CursoController {
 
     @Autowired
     private CicloRepository cicloRepository;
+
+    @Autowired
+    private CursoRepository cursoRepository;
+
+    @Autowired
+    private CarreraRepository carreraRepository;
+
 
     /**
      * Obtiene todos los cursos
@@ -281,5 +292,77 @@ public class CursoController {
         info.put("modalidadId", modalidad.getIdModalidad());
 
         return ResponseEntity.ok(info);
+    }
+    /**
+     * Obtiene información completa para editar un curso
+     */
+    @GetMapping("/editar/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> obtenerInfoCompletaParaEditarCurso(@PathVariable Long id) {
+        // Obtener el curso
+        Optional<Curso> cursoOpt = cursoRepository.findById(id);
+        if (!cursoOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Curso curso = cursoOpt.get();
+        Ciclo ciclo = curso.getCiclo();
+        Carrera carrera = ciclo.getCarrera();
+        ModalidadEducativa modalidad = carrera.getModalidad();
+
+        // Construir el objeto de respuesta con toda la información necesaria
+        Map<String, Object> respuesta = new HashMap<>();
+
+        // Información del curso
+        Map<String, Object> cursoInfo = new HashMap<>();
+        cursoInfo.put("idCurso", curso.getIdCurso());
+        cursoInfo.put("nombre", curso.getNombre());
+        cursoInfo.put("tipo", curso.getTipo());
+        cursoInfo.put("horasSemana", curso.getHorasSemana());
+        respuesta.put("curso", cursoInfo);
+
+        // Información del ciclo
+        Map<String, Object> cicloInfo = new HashMap<>();
+        cicloInfo.put("idCiclo", ciclo.getIdCiclo());
+        cicloInfo.put("numero", ciclo.getNumero());
+        respuesta.put("ciclo", cicloInfo);
+
+        // Información de la carrera
+        Map<String, Object> carreraInfo = new HashMap<>();
+        carreraInfo.put("idCarrera", carrera.getIdCarrera());
+        carreraInfo.put("nombre", carrera.getNombre());
+        respuesta.put("carrera", carreraInfo);
+
+        // Información de la modalidad
+        Map<String, Object> modalidadInfo = new HashMap<>();
+        modalidadInfo.put("idModalidad", modalidad.getIdModalidad());
+        modalidadInfo.put("nombre", modalidad.getNombre());
+        respuesta.put("modalidad", modalidadInfo);
+
+        // Obtener todas las carreras de la modalidad para el select
+        List<Carrera> carrerasDeModalidad = carreraRepository.findByModalidad(modalidad);
+        List<Map<String, Object>> carrerasInfo = carrerasDeModalidad.stream()
+                .map(c -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("idCarrera", c.getIdCarrera());
+                    map.put("nombre", c.getNombre());
+                    return map;
+                })
+                .collect(Collectors.toList());
+        respuesta.put("carrerasDeModalidad", carrerasInfo);
+
+        // Obtener todos los ciclos de la carrera para el select
+        List<Ciclo> ciclosDeCarrera = cicloRepository.findByCarrera(carrera);
+        List<Map<String, Object>> ciclosInfo = ciclosDeCarrera.stream()
+                .map(c -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("idCiclo", c.getIdCiclo());
+                    map.put("numero", c.getNumero());
+                    return map;
+                })
+                .collect(Collectors.toList());
+        respuesta.put("ciclosDeCarrera", ciclosInfo);
+
+        return ResponseEntity.ok(respuesta);
     }
 }

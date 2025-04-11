@@ -276,6 +276,7 @@ public class HorarioService {
                 asignacion.getCurso().getTipo(),
                 asignacion.getCurso().getHorasSemana(),
                 asignacion.getCurso().getCiclo().getNumero().toString(),
+                asignacion.getCurso().getCiclo().getIdCiclo(), // Añadir el ID del ciclo
                 asignacion.getCurso().getCiclo().getCarrera().getNombre(),
                 asignacion.getCurso().getCiclo().getCarrera().getModalidad().getNombre()
         );

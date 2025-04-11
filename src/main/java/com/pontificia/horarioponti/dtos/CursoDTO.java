@@ -14,6 +14,7 @@ public class CursoDTO {
     private Curso.TipoCurso tipo;
     private Integer horasSemana;
     private String cicloNombre;
+    private Long cicloId; // Agregar este campo
     private String carreraNombre;
     private String modalidadNombre;
 }

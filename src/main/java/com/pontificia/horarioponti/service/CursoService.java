@@ -184,6 +184,7 @@ public class CursoService {
                 curso.getTipo(),
                 curso.getHorasSemana(),
                 curso.getCiclo().getNumero().toString(),
+                curso.getCiclo().getIdCiclo(), // Agregar esto
                 curso.getCiclo().getCarrera().getNombre(),
                 curso.getCiclo().getCarrera().getModalidad().getNombre()
         );

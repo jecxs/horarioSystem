@@ -39,5 +39,4 @@ public interface AsignacionHorarioRepository extends JpaRepository<AsignacionHor
             "AND b.idBloque IN :bloqueIds")
     boolean existsConflictoGrupoEnBloques(Long grupoId, DisponibilidadDocente.DiaSemana diaSemana, List<Long> bloqueIds);
 
-
 }
