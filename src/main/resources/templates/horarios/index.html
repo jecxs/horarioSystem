@@ -277,7 +277,48 @@
             // - La hora de fin del bloque es <= a la hora de fin de la disponibilidad
             return bloqueInicioMin >= dispInicioMin && bloqueFinMin <= dispFinMin;
         }
+        // Agregar evento para cuando cambia el día en el modal de asignación
+        $("#asignacionDia").change(function() {
+            const diaSeleccionado = $(this).val();
 
+            if (!diaSeleccionado || !horarioData) {
+                // Si no hay día seleccionado o no se ha cargado el horario, no hacer nada
+                return;
+            }
+
+            // Cargar los bloques disponibles para el día seleccionado
+            // Pasamos null como segundo parámetro para que no haya ningún bloque preseleccionado
+            cargarBloquesDisponibles(diaSeleccionado, null);
+
+            // Si hay un curso y grupo seleccionados, verificar las horas
+            const cursoId = $("#asignacionCurso").val();
+            const grupoId = $("#asignacionGrupo").val();
+
+            if (cursoId && grupoId) {
+                verificarHorasCurso(cursoId, grupoId);
+            }
+        });
+        // Evento para abrir el modal de asignación desde el botón
+        $("#btnNuevaAsignacion").click(function() {
+            // Establecer el día por defecto (por ejemplo, Lunes)
+            const diaDefecto = "Lunes";
+            $("#asignacionDia").val(diaDefecto);
+
+            // Cargar bloques disponibles para ese día
+            cargarBloquesDisponibles(diaDefecto, null);
+
+            // Resetear formulario
+            $("#asignacionModalidad").val("");
+            $("#asignacionCarrera").val("").prop("disabled", true);
+            $("#asignacionCiclo").val("").prop("disabled", true);
+            $("#asignacionCurso").val("").prop("disabled", true);
+            $("#asignacionGrupo").val("").prop("disabled", true);
+            $("#asignacionTipoSesion").val("");
+            $("#asignacionAmbiente").val("");
+
+            // Ocultar información de horas y bloques
+            $("#infoCursoHoras, #infoBloquesSeleccionados").hide();
+        });
         function iniciarNuevaAsignacion(dia, bloqueId) {
             // Preparar el modal de asignación
             $("#modalAsignacion").modal("show");
