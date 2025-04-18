@@ -137,4 +137,48 @@ public class CarreraService {
 
         return cicloRepository.save(ciclo);
     }
+    /**
+     * Actualiza una modalidad educativa existente
+     */
+    @Transactional
+    public ModalidadEducativa actualizarModalidad(Long id, String nombre, Integer duracionAnios) {
+        Optional<ModalidadEducativa> modalidadOpt = modalidadRepository.findById(id);
+        if (!modalidadOpt.isPresent()) {
+            return null;
+        }
+
+        ModalidadEducativa modalidad = modalidadOpt.get();
+
+        // Verificar que no exista otra modalidad con el mismo nombre
+        if (!modalidad.getNombre().equals(nombre)) {
+            boolean existeOtra = modalidadRepository.existsByNombre(nombre);
+            if (existeOtra) {
+                return null;
+            }
+        }
+
+        // Actualizar datos
+        modalidad.setNombre(nombre);
+        modalidad.setDuracionAnios(duracionAnios);
+
+        return modalidadRepository.save(modalidad);
+    }
+
+    /**
+     * Elimina una modalidad educativa si no tiene carreras asociadas
+     */
+    @Transactional
+    public boolean eliminarModalidad(Long id) {
+        Optional<ModalidadEducativa> modalidadOpt = modalidadRepository.findById(id);
+        if (modalidadOpt.isPresent()) {
+            ModalidadEducativa modalidad = modalidadOpt.get();
+
+            // Verificar si tiene carreras asociadas
+            if (modalidad.getCarreras() == null || modalidad.getCarreras().isEmpty()) {
+                modalidadRepository.delete(modalidad);
+                return true;
+            }
+        }
+        return false;
+    }
 }
