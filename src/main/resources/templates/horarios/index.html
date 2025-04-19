@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html(~{::title}, ~{::div#content}, ~{::style}, ~{::script})}">
+    <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html(~{::title}, ~{::div#content}, ~{::style}, ~{::script})}">
 <head>
 
     <title>Tablero de Horarios</title>
@@ -277,7 +277,48 @@
             // - La hora de fin del bloque es <= a la hora de fin de la disponibilidad
             return bloqueInicioMin >= dispInicioMin && bloqueFinMin <= dispFinMin;
         }
+        // Agregar evento para cuando cambia el día en el modal de asignación
+        $("#asignacionDia").change(function() {
+            const diaSeleccionado = $(this).val();
 
+            if (!diaSeleccionado || !horarioData) {
+                // Si no hay día seleccionado o no se ha cargado el horario, no hacer nada
+                return;
+            }
+
+            // Cargar los bloques disponibles para el día seleccionado
+            // Pasamos null como segundo parámetro para que no haya ningún bloque preseleccionado
+            cargarBloquesDisponibles(diaSeleccionado, null);
+
+            // Si hay un curso y grupo seleccionados, verificar las horas
+            const cursoId = $("#asignacionCurso").val();
+            const grupoId = $("#asignacionGrupo").val();
+
+            if (cursoId && grupoId) {
+                verificarHorasCurso(cursoId, grupoId);
+            }
+        });
+        // Evento para abrir el modal de asignación desde el botón
+        $("#btnNuevaAsignacion").click(function() {
+            // Establecer el día por defecto (por ejemplo, Lunes)
+            const diaDefecto = "Lunes";
+            $("#asignacionDia").val(diaDefecto);
+
+            // Cargar bloques disponibles para ese día
+            cargarBloquesDisponibles(diaDefecto, null);
+
+            // Resetear formulario
+            $("#asignacionModalidad").val("");
+            $("#asignacionCarrera").val("").prop("disabled", true);
+            $("#asignacionCiclo").val("").prop("disabled", true);
+            $("#asignacionCurso").val("").prop("disabled", true);
+            $("#asignacionGrupo").val("").prop("disabled", true);
+            $("#asignacionTipoSesion").val("");
+            $("#asignacionAmbiente").val("");
+
+            // Ocultar información de horas y bloques
+            $("#infoCursoHoras, #infoBloquesSeleccionados").hide();
+        });
         function iniciarNuevaAsignacion(dia, bloqueId) {
             // Preparar el modal de asignación
             $("#modalAsignacion").modal("show");
@@ -745,7 +786,7 @@
             }
         });
 
-// Función para verificar las horas disponibles para un curso/grupo
+        // Función para verificar las horas disponibles para un curso/grupo
         function verificarHorasCurso(cursoId, grupoId) {
             $.ajax({
                 url: "/horarios/verificar-horas-curso",
@@ -1184,49 +1225,8 @@
                 }
             });
         }
-        // Función para cargar un curso para editar
-        function cargarCursoParaEditar(cursoId) {
-            $.ajax({
-                url: `/cursos/${cursoId}`,
-                method: "GET",
-                success: function(curso) {
-                    // Guardar el ID del curso para actualizar
-                    $("#cursoId").val(curso.idCurso);
 
-                    // Obtener información de ciclo, carrera y modalidad
-                    $.ajax({
-                        url: `/cursos/ciclos/${curso.cicloId}`,
-                        method: "GET",
-                        success: function(ciclo) {
-                            // Seleccionar modalidad
-                            $("#cursoModalidad").val(ciclo.carrera.modalidad.idModalidad).trigger("change");
 
-                            // Cuando la carrera se haya cargado, seleccionarla
-                            setTimeout(function() {
-                                $("#cursoCarrera").val(ciclo.carrera.idCarrera).trigger("change");
-
-                                // Cuando el ciclo se haya cargado, seleccionarlo
-                                setTimeout(function() {
-                                    $("#cursoCiclo").val(ciclo.idCiclo);
-
-                                    // Completar el resto de datos del formulario
-                                    $("#cursoNombre").val(curso.nombre);
-                                    $("#cursoTipo").val(curso.tipo);
-                                    $("#cursoHoras").val(curso.horasSemana);
-
-                                    // Cambiar el texto del botón y título
-                                    $("#btnGuardarCurso").text("Actualizar Curso");
-                                    $("#nuevoCursoTitle").text("Editar Curso");
-
-                                    // Mostrar la pestaña de formulario
-                                    $("#nuevo-curso-tab").tab("show");
-                                }, 300);
-                            }, 300);
-                        }
-                    });
-                }
-            });
-        }
 
         // Similares funciones de carga y gestión para los demás modales de configuración
         $("#btnGuardarModalidad").click(function() {
@@ -1604,58 +1604,95 @@
         // Cargar tabla de ciclos
         cargarCiclos();
     });
-    // Agregar este código en el script para manejar el modal de cursos
-    // Estos eventos ya deberían existir pero los incluyo para completitud
+    // Evento para cambio de modalidad (resetea la selección de carrera y ciclo)
     $("#cursoModalidad").change(function() {
         const modalidadId = $(this).val();
+        const cursoId = $("#cursoId").val(); // Si hay ID, estamos en modo edición
+
+        // Resetear los selects de carrera y ciclo
+        $("#cursoCarrera").empty().append('<option value="">Seleccione modalidad primero...</option>').prop("disabled", true);
+        $("#cursoCiclo").empty().append('<option value="">Seleccione carrera primero...</option>').prop("disabled", true);
+
         if (!modalidadId) {
-            $("#cursoCarrera").empty().append('<option value="">Seleccione modalidad primero...</option>').prop("disabled", true);
             return;
         }
+
+        // Mostrar indicador de carga
+        const loadingMsg = $('<div class="text-primary small mt-1">Cargando carreras...</div>');
+        $("#cursoCarrera").after(loadingMsg);
 
         // Cargar carreras por modalidad
         $.ajax({
             url: `/cursos/carreras/modalidad/${modalidadId}`,
             method: "GET",
             success: function(carreras) {
+                loadingMsg.remove();
+
                 const select = $("#cursoCarrera");
                 select.empty().append('<option value="">Seleccione...</option>');
+
+                if (carreras.length === 0) {
+                    select.append('<option value="" disabled>No hay carreras disponibles</option>');
+                    return;
+                }
 
                 carreras.forEach(carrera => {
                     select.append(new Option(carrera.nombre, carrera.idCarrera));
                 });
 
                 select.prop("disabled", false);
+            },
+            error: function() {
+                loadingMsg.remove();
+                alert("Error al cargar las carreras");
             }
         });
     });
 
 
-    // De manera similar, añadiremos el evento para cuando se selecciona una carrera
+
+    // Evento para cambio de carrera (resetea la selección de ciclo)
     $("#cursoCarrera").change(function() {
         const carreraId = $(this).val();
+
+        // Resetear el select de ciclo
+        $("#cursoCiclo").empty().append('<option value="">Seleccione carrera primero...</option>').prop("disabled", true);
+
         if (!carreraId) {
-            $("#cursoCiclo").empty().append('<option value="">Seleccione carrera primero...</option>').prop("disabled", true);
             return;
         }
+
+        // Mostrar indicador de carga
+        const loadingMsg = $('<div class="text-primary small mt-1">Cargando ciclos...</div>');
+        $("#cursoCiclo").after(loadingMsg);
 
         // Cargar ciclos por carrera
         $.ajax({
             url: `/cursos/ciclos/carrera/${carreraId}`,
             method: "GET",
             success: function(ciclos) {
+                loadingMsg.remove();
+
                 const select = $("#cursoCiclo");
                 select.empty().append('<option value="">Seleccione...</option>');
+
+                if (ciclos.length === 0) {
+                    select.append('<option value="" disabled>No hay ciclos disponibles</option>');
+                    return;
+                }
 
                 ciclos.forEach(ciclo => {
                     select.append(new Option(`Ciclo ${ciclo.numero}`, ciclo.idCiclo));
                 });
 
                 select.prop("disabled", false);
+            },
+            error: function() {
+                loadingMsg.remove();
+                alert("Error al cargar los ciclos");
             }
         });
     });
-
     // Modificar la función para guardar/actualizar curso
     // Función para guardar o actualizar un curso
     $("#btnGuardarCurso").click(function() {
@@ -1710,13 +1747,24 @@
             }
         });
     });
-    // Función para resetear el formulario de curso
     function resetearFormularioCurso() {
+        // Limpiar el ID del curso y restablecer textos
         $("#cursoId").val("");
-        $("#formCurso")[0].reset();
-        $("#cursoCarrera, #cursoCiclo").prop("disabled", true);
-        $("#btnGuardarCurso").text("Guardar Curso");
         $("#nuevoCursoTitle").text("Nuevo Curso");
+        $("#btnGuardarCurso").text("Guardar Curso");
+
+        // Restablecer todos los campos del formulario
+        $("#formCurso")[0].reset();
+
+        // Limpiar y desactivar selects dependientes
+        $("#cursoCarrera").empty().append('<option value="">Seleccione modalidad primero...</option>').prop("disabled", true);
+        $("#cursoCiclo").empty().append('<option value="">Seleccione carrera primero...</option>').prop("disabled", true);
+
+        // Asegurarse de que todos los elementos estén habilitados
+        $("#cursoModalidad, #cursoNombre, #cursoTipo, #cursoHoras, #btnCancelarCurso, #btnGuardarCurso").prop("disabled", false);
+
+        // Eliminar cualquier mensaje de carga o error que pudiera estar presente
+        $("#cargando-curso, .text-primary.small.mt-1").remove();
     }
 
 
@@ -1807,57 +1855,7 @@
             }
         });
     }
-    // Función para cargar un curso para editar
-    function cargarCursoParaEditar(cursoId) {
-        $.ajax({
-            url: `/cursos/${cursoId}`,
-            method: "GET",
-            success: function(curso) {
-                // Guardar el ID del curso para actualizar
-                $("#cursoId").val(curso.idCurso);
 
-                // Actualizar el título
-                $("#nuevoCursoTitle").text("Editar Curso");
-
-                // Cargar información del ciclo para obtener carrera y modalidad
-                $.ajax({
-                    url: `/cursos/ciclo/${curso.cicloId}`,
-                    method: "GET",
-                    success: function(cicloData) {
-                        // Seleccionar modalidad
-                        $("#cursoModalidad").val(cicloData.modalidadId).trigger("change");
-
-                        // Esperar a que se carguen las carreras y seleccionar
-                        setTimeout(function() {
-                            $("#cursoCarrera").val(cicloData.carreraId).trigger("change");
-
-                            // Esperar a que se carguen los ciclos y seleccionar
-                            setTimeout(function() {
-                                $("#cursoCiclo").val(curso.cicloId);
-
-                                // Completar el resto de campos
-                                $("#cursoNombre").val(curso.nombre);
-                                $("#cursoTipo").val(curso.tipo);
-                                $("#cursoHoras").val(curso.horasSemana);
-
-                                // Cambiar el texto del botón
-                                $("#btnGuardarCurso").text("Actualizar Curso");
-
-                                // Mostrar la pestaña de edición
-                                $("#nuevo-curso-tab").tab("show");
-                            }, 300);
-                        }, 300);
-                    },
-                    error: function() {
-                        alert("Error al cargar los datos del ciclo");
-                    }
-                });
-            },
-            error: function() {
-                alert("Error al cargar el curso para editar");
-            }
-        });
-    }
     // Cargar la lista de cursos al abrir el modal
     // Cargar cursos al abrir el modal
     $("#modalCurso").on('shown.bs.modal', function() {
@@ -2509,7 +2507,196 @@
         // Cargar todos los ambientes
         cargarAmbientes();
     });
-</script>
 
+</script>
+<script>
+    // Función para cargar curso para editar (modificada para arquitectura Thymeleaf)
+    window.cargarCursoParaEditar = function(cursoId) {
+        console.log('Iniciando carga de curso para editar con enfoque Thymeleaf:', cursoId);
+
+        // Primero, asegurarse que el modal está completamente cargado
+        // o mostrarlo si no está visible
+        if (!$('#modalCurso').hasClass('show')) {
+            $('#modalCurso').modal('show');
+
+            // Dar tiempo para que el modal se muestre completamente
+            setTimeout(function() {
+                iniciarCargaDeCurso(cursoId);
+            }, 500);
+        } else {
+            iniciarCargaDeCurso(cursoId);
+        }
+    };
+
+    function iniciarCargaDeCurso(cursoId) {
+        // Cambiar a la pestaña de formulario primero
+        $('#nuevo-curso-tab').tab('show');
+
+        // Mostrar indicador de carga
+        $('#nuevo-curso').prepend(
+            '<div id="curso-loading-overlay" class="alert alert-info" role="alert">' +
+            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' +
+            'Cargando información del curso...' +
+            '</div>'
+        );
+
+        // Desactivar formulario mientras carga
+        $('#formCurso select, #formCurso input, #formCurso button').prop('disabled', true);
+
+        // Secuencia de carga de datos con patrón de error-first para mejor control
+        cargarDatosCurso(cursoId);
+    }
+
+    // Patrón escalonado para manejar mejor las llamadas AJAX dependientes
+    function cargarDatosCurso(cursoId) {
+        $.ajax({
+            url: `/cursos/${cursoId}`,
+            method: 'GET',
+            cache: false,
+            success: function(curso) {
+                console.log('Datos curso recibidos:', curso);
+
+                // Guardar datos en variables locales para uso posterior
+                window.cursoEnEdicion = curso;
+
+                // Ahora cargar datos del ciclo
+                cargarDatosCiclo(curso);
+            },
+            error: function(xhr) {
+                console.error('Error cargando curso:', xhr);
+                finalizarConError('No se pudo cargar la información del curso.');
+            }
+        });
+    }
+
+    function cargarDatosCiclo(curso) {
+        $.ajax({
+            url: `/cursos/ciclo/${curso.cicloId}`,
+            method: 'GET',
+            cache: false,
+            success: function(cicloData) {
+                console.log('Datos ciclo recibidos:', cicloData);
+
+                // Guardar datos del ciclo
+                window.cicloEnEdicion = cicloData;
+
+                // Ahora cargar carreras de la modalidad
+                cargarCarrerasDeModalidad(curso, cicloData);
+            },
+            error: function(xhr) {
+                console.error('Error cargando ciclo:', xhr);
+                finalizarConError('No se pudo cargar la información del ciclo.');
+            }
+        });
+    }
+
+    function cargarCarrerasDeModalidad(curso, cicloData) {
+        $.ajax({
+            url: `/cursos/carreras/modalidad/${cicloData.modalidadId}`,
+            method: 'GET',
+            cache: false,
+            success: function(carreras) {
+                console.log('Carreras recibidas:', carreras);
+
+                // Guardar carreras
+                window.carrerasDisponibles = carreras;
+
+                // Cargar ciclos de la carrera
+                cargarCiclosDeCarrera(curso, cicloData, carreras);
+            },
+            error: function(xhr) {
+                console.error('Error cargando carreras:', xhr);
+                finalizarConError('No se pudo cargar las carreras disponibles.');
+            }
+        });
+    }
+
+    function cargarCiclosDeCarrera(curso, cicloData, carreras) {
+        $.ajax({
+            url: `/cursos/ciclos/carrera/${cicloData.carreraId}`,
+            method: 'GET',
+            cache: false,
+            success: function(ciclos) {
+                console.log('Ciclos recibidos:', ciclos);
+
+                // Guardar ciclos
+                window.ciclosDisponibles = ciclos;
+
+                // Ahora podemos llenar el formulario con todos los datos
+                llenarFormularioCurso(curso, cicloData, carreras, ciclos);
+            },
+            error: function(xhr) {
+                console.error('Error cargando ciclos:', xhr);
+                finalizarConError('No se pudo cargar los ciclos disponibles.');
+            }
+        });
+    }
+
+    function llenarFormularioCurso(curso, cicloData, carreras, ciclos) {
+        try {
+            console.log('Iniciando llenado de formulario');
+
+            // 1. Establecer ID y títulos
+            $('#cursoId').val(curso.idCurso);
+            $('#nuevoCursoTitle').text('Editar Curso');
+            $('#btnGuardarCurso').text('Actualizar Curso');
+
+            // 2. Seleccionar modalidad
+            $('#cursoModalidad').val(cicloData.modalidadId);
+
+            // 3. Llenar selector de carreras
+            const carreraSelect = $('#cursoCarrera');
+            carreraSelect.empty().append('<option value="">Seleccione...</option>');
+            carreras.forEach(function(carrera) {
+                carreraSelect.append(new Option(carrera.nombre, carrera.idCarrera));
+            });
+            carreraSelect.prop('disabled', false);
+            carreraSelect.val(cicloData.carreraId);
+
+            // 4. Llenar selector de ciclos
+            const cicloSelect = $('#cursoCiclo');
+            cicloSelect.empty().append('<option value="">Seleccione...</option>');
+            ciclos.forEach(function(ciclo) {
+                cicloSelect.append(new Option(`Ciclo ${ciclo.numero}`, ciclo.idCiclo));
+            });
+            cicloSelect.prop('disabled', false);
+            cicloSelect.val(curso.cicloId);
+
+            // 5. Completar resto del formulario
+            $('#cursoNombre').val(curso.nombre);
+            $('#cursoTipo').val(curso.tipo);
+            $('#cursoHoras').val(curso.horasSemana);
+
+            // 6. Habilitamos todos los controles
+            $('#formCurso select, #formCurso input, #formCurso button').prop('disabled', false);
+
+            // 7. Quitamos overlay de carga
+            $('#curso-loading-overlay').remove();
+
+            console.log('Formulario completado con éxito');
+        } catch (e) {
+            console.error('Error al llenar formulario:', e);
+            finalizarConError('Error inesperado al llenar el formulario.');
+        }
+    }
+
+    function finalizarConError(mensaje) {
+        $('#curso-loading-overlay').remove();
+        alert(mensaje);
+
+        // Resetear formulario
+        if (typeof resetearFormularioCurso === 'function') {
+            resetearFormularioCurso();
+        } else {
+            $('#cursoId').val('');
+            $('#nuevoCursoTitle').text('Nuevo Curso');
+            $('#btnGuardarCurso').text('Guardar Curso');
+            $('#formCurso')[0].reset();
+            $('#cursoCarrera, #cursoCiclo').prop('disabled', true);
+        }
+    }
+
+    console.log('Nueva función de edición de cursos instalada para arquitectura Thymeleaf');
+</script>
 </body>
 </html>
