@@ -13,19 +13,33 @@ public class ApiResponse<T> {
     private boolean success;
     private String message;
     private T data;
+    private String error;
 
-    /** * respuesta exitosa con datos */
+    /** * Constructor para respuestas sin detalle técnico de error */
+    public ApiResponse(boolean success, String message, T data) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+        this.error = null;
+    }
+
+    /** * Respuesta exitosa con datos */
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(true, null, data);
     }
 
-    /** * respuesta exitosa con datos y mensaje */
+    /** * Respuesta exitosa con datos y mensaje */
     public static <T> ApiResponse<T> success(T data, String message) {
         return new ApiResponse<>(true, message, data);
     }
 
-    /** * respuesta de error con mensaje */
+    /** * Respuesta de error con mensaje para el usuario */
     public static <T> ApiResponse<T> error(String message) {
         return new ApiResponse<>(false, message, null);
+    }
+
+    /** * Respuesta de error con mensaje para el usuario y detalle técnico */
+    public static <T> ApiResponse<T> error(String message, String errorDetail) {
+        return new ApiResponse<>(false, message, null, errorDetail);
     }
 }

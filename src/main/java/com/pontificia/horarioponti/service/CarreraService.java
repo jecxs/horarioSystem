@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CarreraService {
@@ -69,6 +70,7 @@ public class CarreraService {
         }
         return List.of();
     }
+
 
     /**
      * Crea una nueva carrera
@@ -149,7 +151,6 @@ public class CarreraService {
 
         ModalidadEducativa modalidad = modalidadOpt.get();
 
-        // Verificar que no exista otra modalidad con el mismo nombre
         if (!modalidad.getNombre().equals(nombre)) {
             boolean existeOtra = modalidadRepository.existsByNombre(nombre);
             if (existeOtra) {
@@ -157,7 +158,7 @@ public class CarreraService {
             }
         }
 
-        // Actualizar datos
+
         modalidad.setNombre(nombre);
         modalidad.setDuracionAnios(duracionAnios);
 

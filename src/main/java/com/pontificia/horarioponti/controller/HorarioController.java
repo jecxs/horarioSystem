@@ -279,7 +279,7 @@ public class HorarioController {
     }
     @GetMapping("/ciclo/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, Long>> obtenerInfoCiclo(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> obtenerInfoCiclo(@PathVariable Long id) {
         Optional<Ciclo> cicloOpt = cicloRepository.findById(id);
         if (!cicloOpt.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -289,7 +289,7 @@ public class HorarioController {
         Carrera carrera = ciclo.getCarrera();
         ModalidadEducativa modalidad = carrera.getModalidad();
 
-        Map<String, Long> info = new HashMap<>();
+        Map<String, Object> info = new HashMap<>();
         info.put("cicloId", ciclo.getIdCiclo());
         info.put("carreraId", carrera.getIdCarrera());
         info.put("modalidadId", modalidad.getIdModalidad());
