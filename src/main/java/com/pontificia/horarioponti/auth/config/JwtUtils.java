@@ -1,5 +1,6 @@
 package com.pontificia.horarioponti.auth.config;
 
+import com.pontificia.horarioponti.auth.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,19 +21,26 @@ public class JwtUtils {
     @Value("${app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    private static final String DEFAULT_ROLE = "TEACHER";
+    private static final Role DEFAULT_ROLE = Role.TEACHER;
 
     private Key key() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(UUID userId, String username, String role) {
-        String userRole = (role != null && !role.isEmpty()) ? role : DEFAULT_ROLE;
+    public String generateToken(UUID userId, String username, String roleStr) {
+        Role userRole;
+        try {
+            userRole = (roleStr != null && !roleStr.isEmpty())
+                    ? Role.valueOf(roleStr)
+                    : DEFAULT_ROLE;
+        } catch (IllegalArgumentException e) {
+            userRole = DEFAULT_ROLE;
+        }
 
         return Jwts.builder()
                 .claim("userId", userId.toString())
                 .claim("username", username)
-                .claim("role", userRole)
+                .claim("role", userRole.name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)
