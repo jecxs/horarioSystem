@@ -1,5 +1,6 @@
 package com.pontificia.horarioponti.exception;
 
+import com.pontificia.horarioponti.payload.response.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,55 +20,30 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<GenericErrorResponse<String>> handleEntityNotFoundException(
-            EntityNotFoundException ex) {
-
-        GenericErrorResponse<String> respuesta = new GenericErrorResponse<>(
-                "Recurso no encontrado",
-                ex.getMessage()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+    public ResponseEntity<ApiResponse<Void>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("Recurso no encontrado", ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<GenericErrorResponse<String>> handleIllegalArgumentException(
-            IllegalArgumentException ex) {
-
-        GenericErrorResponse<String> respuesta = new GenericErrorResponse<>(
-                "Solicitud incorrecta",
-                ex.getMessage()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Solicitud incorrecta", ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GenericErrorResponse<Map<String, String>>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errores = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(fieldError ->
-                errores.put(fieldError.getField(), fieldError.getDefaultMessage())
-        );
+                errores.put(fieldError.getField(), fieldError.getDefaultMessage()));
 
-        GenericErrorResponse<Map<String, String>> respuesta = new GenericErrorResponse<>(
-                "Existen errores en la petición",
-                errores
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Existen errores en la petición", errores.toString()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<GenericErrorResponse<String>> handleAllUncaughtException(
-            Exception exception) {
-
-        GenericErrorResponse<String> respuesta = new GenericErrorResponse<>(
-                "Error interno del servidor",
-                exception.getMessage()
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+    public ResponseEntity<ApiResponse<Void>> handleAllUncaughtException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Error interno del servidor", exception.getMessage()));
     }
 }
