@@ -18,7 +18,7 @@ public class EducationalModality {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID idModalidad;
+    private UUID idModality;
 
     @Column(nullable = false, length = 100)
     private String name;
