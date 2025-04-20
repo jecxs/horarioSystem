@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.auth.config;
 
-import com.pontificia.horarioponti.repository.model.Role;
+import com.pontificia.horarioponti.enums.Role;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,6 @@ public class RoleFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Excluir rutas públicas del filtro
         if (isPublicPath(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
@@ -55,13 +54,10 @@ public class RoleFilter extends OncePerRequestFilter {
     }
 
     private boolean isPublicPath(String path) {
-        return path.startsWith("/api/auth") ||
-                path.startsWith("/swagger") ||
-                path.startsWith("/v3/api-docs");
+        return path.startsWith("/api/auth");
     }
 
     private boolean hasRequiredRole(Role userRole, Role requiredRole) {
-        // Jerarquía de roles (SUPER_ADMIN > ADMIN > TEACHER > SECRETARIAT)
         return userRole.ordinal() <= requiredRole.ordinal();
     }
 
@@ -78,7 +74,7 @@ public class RoleFilter extends OncePerRequestFilter {
         if (path.startsWith("/api/secretariat")) {
             return Role.SECRETARIAT;
         }
-        return null; // Rutas sin requerimiento específico
+        return null;
     }
 
 }

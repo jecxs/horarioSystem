@@ -20,7 +20,7 @@ public class JwtUtils {
     @Value("${app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    private static final String DEFAULT_ROLE = "TEACHER"; // Rol por defecto
+    private static final String DEFAULT_ROLE = "TEACHER";
 
     private Key key() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
@@ -32,7 +32,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .claim("userId", userId.toString())
                 .claim("username", username)
-                .claim("role", userRole) // Usa el rol especificado o TEACHER por defecto
+                .claim("role", userRole)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)

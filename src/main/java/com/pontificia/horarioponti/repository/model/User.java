@@ -1,5 +1,6 @@
 package com.pontificia.horarioponti.repository.model;
 
+import com.pontificia.horarioponti.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

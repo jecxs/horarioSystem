@@ -23,7 +23,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if(token != null && jwtUtils.validateToken(token)) {
             String username = jwtUtils.getUsernameFromToken(token);
-            // Aquí podrías establecer el usuario en el contexto si lo necesitas
         }
 
         filterChain.doFilter(request, response);

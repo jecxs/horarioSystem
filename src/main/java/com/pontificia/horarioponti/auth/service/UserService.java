@@ -3,7 +3,7 @@ package com.pontificia.horarioponti.auth.service;
 import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
 import com.pontificia.horarioponti.repository.UserRepository;
 import com.pontificia.horarioponti.repository.model.User;
-import com.pontificia.horarioponti.repository.model.Role;
+import com.pontificia.horarioponti.enums.Role;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class UserService {
         user.setUsername(username);
         user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
 
-        user.setRole(Role.TEACHER); // Rol fijo y automático
+        user.setRole(Role.TEACHER);
 
         return userRepository.save(user);
     }
