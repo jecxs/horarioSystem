@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti;
+package com.pontificia.horarioponti.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.SerializationFeature;
