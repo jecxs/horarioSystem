@@ -10,21 +10,25 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "modalidad_educativa")
+@Table(name = "educational_modality")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModalidadEducativa {
+public class EducationalModality {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID idModalidad;
 
     @Column(nullable = false, length = 100)
-    private String nombre;
+    private String name;
 
     @Column(nullable = false)
-    private Integer duracionAnios;
+    private Integer duration_years;
+
+
+    private Integer description;
+
 
  //   @OneToMany(mappedBy = "modalidad", cascade = CascadeType.ALL)
   //  @JsonIgnore
