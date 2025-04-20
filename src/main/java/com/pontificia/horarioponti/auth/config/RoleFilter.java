@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.auth.config;
 
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.auth.enums.Role;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

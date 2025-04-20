@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.auth.dto;
 
-import com.pontificia.horarioponti.repository.model.Role;
+import com.pontificia.horarioponti.auth.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class UserInfoResponse {
 
-    private UUID id;
+    private UUID uuid;
     private String username;
     private Role role;
 

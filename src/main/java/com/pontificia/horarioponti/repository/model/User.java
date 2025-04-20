@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.repository.model;
 
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.auth.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;  // Cambiamos a UUID
+    private UUID id;
 
     @Column(unique = true, nullable = false)
     private String username;

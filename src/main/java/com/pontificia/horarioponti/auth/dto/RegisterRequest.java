@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.auth.dto;
 
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.auth.enums.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
