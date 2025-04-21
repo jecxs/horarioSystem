@@ -13,7 +13,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EducationalModalityResponseDTO {
 
-    private UUID id;
+    private UUID uuid;
     private String name;
     private Integer durationYears;
     private String description;
