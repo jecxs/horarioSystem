@@ -1,39 +1,38 @@
 package com.pontificia.horarioponti.utils.abstractBase;
 
-import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public abstract class BaseService<T extends BaseEntity, R extends BaseRepository<T>> {
 
-    protected final R repository;
+abstract class BaseService<T extends BaseEntity> {
 
-    protected BaseService(R repository) {
-        this.repository = repository;
-    }
+    protected abstract BaseRepository<T> getRepository();
 
-    @Transactional
     public List<T> findAll() {
-        return repository.findAll();
+        return getRepository().findAll();
     }
 
-    @Transactional
-    public T findByUuid(UUID uuid) {
-        return repository.findByUuid(uuid).orElse(null);
+    public Page<T> findAll(Pageable pageable) {
+        return getRepository().findAll(pageable);
     }
 
-    @Transactional
+    public Optional<T> findById(UUID id) {
+        return getRepository().findById(id);
+    }
+
     public T save(T entity) {
-        return repository.save(entity);
+        return getRepository().save(entity);
     }
 
-    @Transactional
-    public boolean deleteByUuid(UUID uuid) {
-        if (repository.existsByUuid(uuid)) {
-            repository.deleteById(uuid);
-            return true;
-        }
-        return false;
+    public T update(T entity) {
+        return getRepository().save(entity);
+    }
+
+    public void deleteById(UUID id) {
+        getRepository().deleteById(id);
     }
 }
