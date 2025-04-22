@@ -22,6 +22,7 @@ public class EducationalModality extends BaseEntity {
     @Column(nullable = false)
     private Integer durationYears;
 
+    @Lob
     private String description;
 
    // @OneToMany(mappedBy = "modalidad", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
