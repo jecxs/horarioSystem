@@ -16,7 +16,10 @@ public class ApiResponse<T> {
 
     private String message;
     private T data;
-    private String error;
+
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Object error;
 
     /** * Constructor para respuestas sin detalle técnico de error */
     public ApiResponse(String message, T data) {
@@ -41,8 +44,8 @@ public class ApiResponse<T> {
     }
 
     /** * Respuesta de error con mensaje para el usuario y detalle técnico */
-    public static <T> ApiResponse<T> error(String message, String errorDetail) {
-        return new ApiResponse<>( message, null, errorDetail);
+    public static <T> ApiResponse<T> error(String message, Object errorDetail) {
+        return new ApiResponse<>(message, null, errorDetail);
     }
 }
 

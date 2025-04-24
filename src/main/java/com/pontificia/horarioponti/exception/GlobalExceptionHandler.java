@@ -13,7 +13,9 @@ import org.springframework.web.context.request.WebRequest;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -32,13 +34,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errores = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(fieldError ->
-                errores.put(fieldError.getField(), fieldError.getDefaultMessage()));
+    public ResponseEntity<ApiResponse<List<Map<String, String>>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        List<Map<String, String>> errores = new ArrayList<>();
+
+        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
+            Map<String, String> error = new HashMap<>();
+            error.put("field", fieldError.getField());
+            error.put("message", fieldError.getDefaultMessage());
+            errores.add(error);
+        });
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error("Existen errores en la petición", errores.toString()));
+                .body(ApiResponse.error("Existen errores en la petición", errores));
     }
 
     @ExceptionHandler(Exception.class)

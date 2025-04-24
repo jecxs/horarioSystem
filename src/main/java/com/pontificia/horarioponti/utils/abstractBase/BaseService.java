@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-abstract class BaseService<T extends BaseEntity> {
+public abstract class BaseService<T extends BaseEntity> {
 
     protected abstract BaseRepository<T> getRepository();
 
