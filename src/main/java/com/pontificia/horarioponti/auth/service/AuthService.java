@@ -1,22 +1,22 @@
 package com.pontificia.horarioponti.auth.service;
 
 import com.pontificia.horarioponti.auth.config.JwtUtils;
-import com.pontificia.horarioponti.repository.UserRepository;
-import com.pontificia.horarioponti.repository.model.User;
+import com.pontificia.horarioponti.modules.User.UserRepository;
+import com.pontificia.horarioponti.modules.User.User;
+import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private JwtUtils jwtUtils;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final JwtUtils jwtUtils;
+
+    private final UserRepository userRepository;
 
     public String authenticate(String username, String password) {
         User user = userRepository.findByUsername(username)
@@ -26,7 +26,7 @@ public class AuthService {
             throw new RuntimeException("Credenciales inválidas");
         }
 
-        return jwtUtils.generateToken(user.getId(), user.getUsername(), user.getRole().name());
+        return jwtUtils.generateToken(user.getUuid(), user.getUsername(), user.getRole().name());
     }
 
     public String getUsernameFromToken(String token) {

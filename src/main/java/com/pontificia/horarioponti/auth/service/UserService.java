@@ -1,21 +1,21 @@
 package com.pontificia.horarioponti.auth.service;
 
 import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
-import com.pontificia.horarioponti.repository.UserRepository;
-import com.pontificia.horarioponti.repository.model.User;
+import com.pontificia.horarioponti.modules.User.UserRepository;
+import com.pontificia.horarioponti.modules.User.User;
 import com.pontificia.horarioponti.auth.enums.Role;
+import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
@@ -40,7 +40,7 @@ public class UserService {
     public UserInfoResponse getUserInfo(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return user.map(u -> new UserInfoResponse(
-                u.getId(),
+                u.getUuid(),
                 u.getUsername(),
                 u.getRole()
         )).orElse(null);

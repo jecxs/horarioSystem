@@ -1,6 +1,7 @@
-package com.pontificia.horarioponti.repository.model;
+package com.pontificia.horarioponti.modules.User;
 
 import com.pontificia.horarioponti.auth.enums.Role;
+import com.pontificia.horarioponti.utils.abstractBase.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,11 +14,7 @@ import java.util.UUID;
 })
 @Getter
 @Setter
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+public class User extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String username;
