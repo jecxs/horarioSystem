@@ -10,10 +10,10 @@ import java.util.Optional;
 @Repository
 public interface CareerRepository extends BaseRepository<Career> {
 
-    List<Career> findByModality(EducationalModality modalidad);
+    List<Career> findByModality(EducationalModality modality);
 
-    Optional<Career> findByNombreAndModality(String nombre, EducationalModality modalidad);
+    Optional<Career> findByNameAndModality(String name, EducationalModality modality);
 
-    boolean existsByNameAndModality(String nombre, EducationalModality modalidad);
+    boolean existsByNameAndModality(String name, EducationalModality modality);
 
 }

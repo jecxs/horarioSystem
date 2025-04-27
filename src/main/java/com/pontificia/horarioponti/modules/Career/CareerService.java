@@ -48,7 +48,7 @@ public class CareerService extends BaseService<Career> {
         EducationalModality modality = new EducationalModality();
         modality.setName(nombre);
         modality.setDurationYears(durationYears);
-        modality.setCareers(new ArrayList<>());
+        /* modality.setCareers(new ArrayList<>()); */
 
         return modalityRepository.save(modality);
     }
