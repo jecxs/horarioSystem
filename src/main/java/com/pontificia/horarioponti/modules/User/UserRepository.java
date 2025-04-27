@@ -1,7 +1,6 @@
-package com.pontificia.horarioponti.repository;
+package com.pontificia.horarioponti.modules.User;
 
 
-import com.pontificia.horarioponti.repository.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
