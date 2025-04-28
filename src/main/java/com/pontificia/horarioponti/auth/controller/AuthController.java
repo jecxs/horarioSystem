@@ -1,6 +1,9 @@
 package com.pontificia.horarioponti.auth.controller;
 
-import com.pontificia.horarioponti.auth.dto.*;
+import com.pontificia.horarioponti.auth.dto.JwtResponse;
+import com.pontificia.horarioponti.auth.dto.LoginRequest;
+import com.pontificia.horarioponti.auth.dto.RegisterRequest;
+import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
 import com.pontificia.horarioponti.auth.service.AuthService;
 import com.pontificia.horarioponti.auth.service.UserService;
 import com.pontificia.horarioponti.payload.response.ApiResponse;
@@ -12,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -22,23 +25,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<JwtResponse>> login(@RequestBody LoginRequest request) {
-        String token = authService.authenticate(request.getUsername(), request.getPassword());
-        if(token != null) {
-            return ResponseEntity.ok(ApiResponse.success(new JwtResponse(token), "Login exitoso"));
+        try {
+            JwtResponse jwtResponse = authService.authenticate(request.getUsername(), request.getPassword());
+            UserInfoResponse user = jwtResponse.getUser();
+
+            JwtResponse response = new JwtResponse(jwtResponse.getToken(), user);
+
+            return ResponseEntity.ok(ApiResponse.success(response, "Login exitoso"));
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(e.getMessage()));
         }
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Credenciales inválidas"));
     }
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> registerTeacher(@RequestBody @Valid RegisterRequest request) {
         try {
-            userService.createUser(
-                    request.getUsername(),
-                    request.getPassword()
-            );
-            return ResponseEntity.ok(ApiResponse.success("Docente registrado exitosamente"));
+            userService.createUser(request);
+            return ResponseEntity.ok(ApiResponse.success(null, "Usuario registrado exitosamente"));
         } catch (RuntimeException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)

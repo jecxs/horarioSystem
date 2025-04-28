@@ -1,6 +1,7 @@
 package com.pontificia.horarioponti.modules.User;
 
 
+import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

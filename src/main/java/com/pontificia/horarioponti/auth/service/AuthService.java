@@ -1,8 +1,10 @@
 package com.pontificia.horarioponti.auth.service;
 
 import com.pontificia.horarioponti.auth.config.JwtUtils;
-import com.pontificia.horarioponti.modules.User.UserRepository;
+import com.pontificia.horarioponti.auth.dto.JwtResponse;
+import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
 import com.pontificia.horarioponti.modules.User.User;
+import com.pontificia.horarioponti.modules.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -13,12 +15,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthService {
 
-
     private final JwtUtils jwtUtils;
 
     private final UserRepository userRepository;
 
-    public String authenticate(String username, String password) {
+    public JwtResponse authenticate(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -26,7 +27,11 @@ public class AuthService {
             throw new RuntimeException("Credenciales inválidas");
         }
 
-        return jwtUtils.generateToken(user.getUuid(), user.getUsername(), user.getRole().name());
+        UserInfoResponse userInfo = new UserInfoResponse(user.getUuid(), user.getUsername(), user.getRole(), user.getFirstName(), user.getLastName(), user.getDocumentNumber());
+
+        String token = jwtUtils.generateToken(user.getUuid(), user.getUsername(), user.getRole().name());
+
+        return new JwtResponse(token, userInfo);
     }
 
     public String getUsernameFromToken(String token) {

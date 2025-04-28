@@ -1,5 +1,6 @@
 package com.pontificia.horarioponti.auth.service;
 
+import com.pontificia.horarioponti.auth.dto.RegisterRequest;
 import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
 import com.pontificia.horarioponti.modules.User.UserRepository;
 import com.pontificia.horarioponti.modules.User.User;
@@ -9,7 +10,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,24 +17,22 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
+    public void createUser(RegisterRequest userPayload) {
 
-    public User createUser(String username, String password) {
-
-        if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("El nombre de usuario ya existe");
+        if (userRepository.existsByUsername(userPayload.getUsername())) {
+            throw new RuntimeException("Usuario ya registrado");
         }
 
-
         User user = new User();
-        user.setUsername(username);
-        user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        user.setUsername(userPayload.getUsername());
+        user.setPassword(BCrypt.hashpw(userPayload.getPassword(), BCrypt.gensalt()));
+        user.setFirstName(userPayload.getFirstName());
+        user.setLastName(userPayload.getLastName());
+        user.setDocumentNumber(userPayload.getDocumentNumber());
 
         user.setRole(Role.TEACHER);
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     public UserInfoResponse getUserInfo(String username) {
@@ -42,11 +40,10 @@ public class UserService {
         return user.map(u -> new UserInfoResponse(
                 u.getUuid(),
                 u.getUsername(),
-                u.getRole()
+                u.getRole(),
+                u.getFirstName(),
+                u.getLastName(),
+                u.getDocumentNumber()
         )).orElse(null);
-    }
-
-    public User getUserById(UUID userId) {
-        return userRepository.findById(userId).orElse(null);
     }
 }

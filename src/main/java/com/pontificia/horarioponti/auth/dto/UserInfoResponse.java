@@ -10,11 +10,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-
 public class UserInfoResponse {
 
     private UUID uuid;
     private String username;
     private Role role;
+    private String firstName;
+    private String lastName;
+    private String documentNumber;
 
 }
