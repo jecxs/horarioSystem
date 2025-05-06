@@ -1,25 +1,18 @@
 package com.pontificia.horarioponti.modules.Career;
 
-import com.pontificia.horarioponti.modules.ModalidadEducativa.EducationalModality;
-import com.pontificia.horarioponti.modules.ModalidadEducativa.EducationalModalityRepository;
-import com.pontificia.horarioponti.utils.abstractBase.BaseRepository;
+import com.pontificia.horarioponti.modules.EducationalModality.EducationalModality;
+import com.pontificia.horarioponti.modules.EducationalModality.EducationalModalityRepository;
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class CareerService extends BaseService<Career> {
-    @Override
-    protected BaseRepository<Career> getRepository() {
-        return null;
-    }
-
     @Autowired
     private EducationalModalityRepository modalityRepository;
 

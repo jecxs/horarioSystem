@@ -1,21 +1,19 @@
-package com.pontificia.horarioponti.auth.service;
+package com.pontificia.horarioponti.modules.Auth.service;
 
-import com.pontificia.horarioponti.auth.config.JwtUtils;
-import com.pontificia.horarioponti.auth.dto.JwtResponse;
-import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
+import com.pontificia.horarioponti.modules.Auth.dto.JwtResponse;
+import com.pontificia.horarioponti.modules.Auth.dto.UserInfoResponse;
+import com.pontificia.horarioponti.jwt.services.JwtService;
 import com.pontificia.horarioponti.modules.User.User;
 import com.pontificia.horarioponti.modules.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final JwtUtils jwtUtils;
+    private final JwtService jwtService;
 
     private final UserRepository userRepository;
 
@@ -29,20 +27,12 @@ public class AuthService {
 
         UserInfoResponse userInfo = new UserInfoResponse(user.getUuid(), user.getUsername(), user.getRole(), user.getFirstName(), user.getLastName(), user.getDocumentNumber());
 
-        String token = jwtUtils.generateToken(user.getUuid(), user.getUsername(), user.getRole().name());
+        String token = jwtService.generateToken(user.getUuid(), user.getUsername(), user.getRole().name());
 
         return new JwtResponse(token, userInfo);
     }
 
     public String getUsernameFromToken(String token) {
-        return jwtUtils.getUsernameFromToken(token);
-    }
-
-    public UUID getUserIdFromToken(String token) {
-        return jwtUtils.getUserIdFromToken(token);
-    }
-
-    public String getRoleFromToken(String token) {
-        return jwtUtils.getRoleFromToken(token);
+        return jwtService.getUsernameFromToken(token);
     }
 }

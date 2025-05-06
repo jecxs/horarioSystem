@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti.auth.enums;
+package com.pontificia.horarioponti.modules.Auth.enums;
 
 public enum Role {
 

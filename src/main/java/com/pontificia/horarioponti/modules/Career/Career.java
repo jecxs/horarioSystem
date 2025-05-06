@@ -1,8 +1,7 @@
 package com.pontificia.horarioponti.modules.Career;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pontificia.horarioponti.modules.ModalidadEducativa.EducationalModality;
+import com.pontificia.horarioponti.modules.EducationalModality.EducationalModality;
 import com.pontificia.horarioponti.utils.abstractBase.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

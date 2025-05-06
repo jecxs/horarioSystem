@@ -1,6 +1,6 @@
-package com.pontificia.horarioponti.auth.dto;
+package com.pontificia.horarioponti.modules.Auth.dto;
 
-import com.pontificia.horarioponti.auth.enums.Role;
+import com.pontificia.horarioponti.modules.Auth.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

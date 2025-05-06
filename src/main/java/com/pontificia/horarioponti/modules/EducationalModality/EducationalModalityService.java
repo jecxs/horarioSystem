@@ -1,9 +1,8 @@
-package com.pontificia.horarioponti.modules.ModalidadEducativa;
+package com.pontificia.horarioponti.modules.EducationalModality;
 
 import com.pontificia.horarioponti.mapper.EducationalModalityMapper;
 import com.pontificia.horarioponti.payload.request.EducationalModalityRequestDTO;
 import com.pontificia.horarioponti.payload.response.EducationalModalityResponseDTO;
-import com.pontificia.horarioponti.utils.abstractBase.BaseRepository;
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -15,34 +14,21 @@ import java.util.UUID;
 
 @Service
 public class EducationalModalityService extends BaseService<EducationalModality> {
-
-    private final EducationalModalityRepository modalityRepository;
-    private final EducationalModalityMapper modalityMapper;
+    @Autowired
+    private EducationalModalityRepository modalityRepository;
 
     @Autowired
-    public EducationalModalityService(EducationalModalityRepository modalityRepository,
-                                      EducationalModalityMapper modalityMapper) {
-        this.modalityRepository = modalityRepository;
-        this.modalityMapper = modalityMapper;
-    }
-
-    @Override
-    protected BaseRepository<EducationalModality> getRepository() {
-        return modalityRepository;
-    }
-
+    private EducationalModalityMapper modalityMapper;
 
     public List<EducationalModalityResponseDTO> getAllModalities() {
         List<EducationalModality> modalities = findAll();
         return modalityMapper.toResponseDTOList(modalities);
     }
 
-
     public EducationalModalityResponseDTO getModalityById(UUID uuid) {
         EducationalModality modality = findModalityOrThrow(uuid);
         return modalityMapper.toResponseDTO(modality);
     }
-
 
     @Transactional
     public EducationalModalityResponseDTO createModality(EducationalModalityRequestDTO requestDTO) {
@@ -56,7 +42,6 @@ public class EducationalModalityService extends BaseService<EducationalModality>
 
         return modalityMapper.toResponseDTO(savedModality);
     }
-
 
     @Transactional
     public EducationalModalityResponseDTO updateModality(UUID uuid, EducationalModalityRequestDTO requestDTO) {
@@ -74,14 +59,12 @@ public class EducationalModalityService extends BaseService<EducationalModality>
         return modalityMapper.toResponseDTO(updatedModality);
     }
 
-
     @Transactional
     public void deleteModality(UUID uuid) {
         EducationalModality modality = findModalityOrThrow(uuid);
 
         deleteById(uuid);
     }
-
 
     private EducationalModality findModalityOrThrow(UUID uuid) {
         return findById(uuid)

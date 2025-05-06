@@ -1,14 +1,18 @@
 package com.pontificia.horarioponti.modules.User;
 
-import com.pontificia.horarioponti.auth.enums.Role;
+import com.pontificia.horarioponti.modules.Auth.enums.Role;
 import com.pontificia.horarioponti.utils.abstractBase.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.UUID;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -18,7 +22,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -37,4 +41,17 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true, name = "document_number")
     private String documentNumber;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (role == null) {
+            return List.of();
+        }
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
 }

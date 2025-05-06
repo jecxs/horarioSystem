@@ -1,11 +1,9 @@
-package com.pontificia.horarioponti.modules.ModalidadEducativa;
+package com.pontificia.horarioponti.modules.EducationalModality;
 
 
 import com.pontificia.horarioponti.utils.abstractBase.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
 
 @Entity
 @Table(name = "educational_modality")
@@ -19,7 +17,7 @@ public class EducationalModality extends BaseEntity {
     @Column(nullable = false, length = 100, unique = true)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "duration_years")
     private Integer durationYears;
 
     @Lob

@@ -7,6 +7,8 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 import java.util.UUID;
@@ -25,9 +27,11 @@ public  abstract class BaseEntity {
     @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
 
-    @Column(name = "created_at", updatable = false)
+    @CreatedDate
+    @Column(updatable = false, name = "created_at")
     private Date createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
     private Date updatedAt;
 }

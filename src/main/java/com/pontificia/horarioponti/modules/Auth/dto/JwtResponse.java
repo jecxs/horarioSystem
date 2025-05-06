@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti.auth.dto;
+package com.pontificia.horarioponti.modules.Auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,11 +1,11 @@
-package com.pontificia.horarioponti.auth.controller;
+package com.pontificia.horarioponti.modules.Auth.controller;
 
-import com.pontificia.horarioponti.auth.dto.JwtResponse;
-import com.pontificia.horarioponti.auth.dto.LoginRequest;
-import com.pontificia.horarioponti.auth.dto.RegisterRequest;
-import com.pontificia.horarioponti.auth.dto.UserInfoResponse;
-import com.pontificia.horarioponti.auth.service.AuthService;
-import com.pontificia.horarioponti.auth.service.UserService;
+import com.pontificia.horarioponti.modules.Auth.dto.JwtResponse;
+import com.pontificia.horarioponti.modules.Auth.dto.LoginRequest;
+import com.pontificia.horarioponti.modules.Auth.dto.RegisterRequest;
+import com.pontificia.horarioponti.modules.Auth.dto.UserInfoResponse;
+import com.pontificia.horarioponti.modules.Auth.service.AuthService;
+import com.pontificia.horarioponti.modules.Auth.service.UserService;
 import com.pontificia.horarioponti.payload.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class AuthController {
 

@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.modules.Career;
 
-import com.pontificia.horarioponti.modules.ModalidadEducativa.EducationalModality;
+import com.pontificia.horarioponti.modules.EducationalModality.EducationalModality;
 import com.pontificia.horarioponti.utils.abstractBase.BaseRepository;
 import org.springframework.stereotype.Repository;
 

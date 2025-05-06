@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti.auth.dto;
+package com.pontificia.horarioponti.modules.Auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

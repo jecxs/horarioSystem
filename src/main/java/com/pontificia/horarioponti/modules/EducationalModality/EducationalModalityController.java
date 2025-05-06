@@ -1,10 +1,10 @@
-package com.pontificia.horarioponti.modules.ModalidadEducativa;
+package com.pontificia.horarioponti.modules.EducationalModality;
 
 import com.pontificia.horarioponti.payload.request.EducationalModalityRequestDTO;
 import com.pontificia.horarioponti.payload.response.ApiResponse;
 import com.pontificia.horarioponti.payload.response.EducationalModalityResponseDTO;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/educational-modalities")
-@AllArgsConstructor
+@RequestMapping("/api/protected/educational-modalities")
+@RequiredArgsConstructor
 public class EducationalModalityController {
-
+    @Autowired
     private final EducationalModalityService modalityService;
 
     /**
@@ -28,19 +28,6 @@ public class EducationalModalityController {
         List<EducationalModalityResponseDTO> modalities = modalityService.getAllModalities();
         return ResponseEntity.ok(
                 ApiResponse.success(modalities, "Modalidades educativas recuperadas con éxito")
-        );
-    }
-
-    /**
-     * @param uuid ID de la modalidad
-     * @return Modalidad educativa encontrada
-     */
-    @GetMapping("/{uuid}")
-    public ResponseEntity<ApiResponse<EducationalModalityResponseDTO>> getModalityById(
-            @PathVariable UUID uuid) {
-        EducationalModalityResponseDTO modality = modalityService.getModalityById(uuid);
-        return ResponseEntity.ok(
-                ApiResponse.success(modality, "Modalidad educativa recuperada con éxito")
         );
     }
 
@@ -57,7 +44,7 @@ public class EducationalModalityController {
     }
 
     /**
-     * @param uuid ID de la modalidad a actualizar
+     * @param uuid       ID de la modalidad a actualizar
      * @param requestDTO Nuevos datos de la modalidad
      * @return Modalidad educativa actualizada
      */
