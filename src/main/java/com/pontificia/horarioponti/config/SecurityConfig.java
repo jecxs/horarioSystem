@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.config;
 
-import com.pontificia.horarioponti.jwt.filter.JwtFilter;
+import com.pontificia.horarioponti.utils.jwt.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

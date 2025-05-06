@@ -1,9 +1,9 @@
 package com.pontificia.horarioponti.mapper;
 
 
-import com.pontificia.horarioponti.modules.EducationalModality.EducationalModality;
-import com.pontificia.horarioponti.payload.request.EducationalModalityRequestDTO;
-import com.pontificia.horarioponti.payload.response.EducationalModalityResponseDTO;
+import com.pontificia.horarioponti.modules.educational_modality.EducationalModality;
+import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityRequestDTO;
+import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityResponseDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.config;
 
-import com.pontificia.horarioponti.payload.response.ApiResponse;
+import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
