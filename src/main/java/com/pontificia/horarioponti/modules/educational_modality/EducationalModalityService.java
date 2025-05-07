@@ -34,7 +34,7 @@ public class EducationalModalityService extends BaseService<EducationalModality>
     public EducationalModalityResponseDTO createModality(EducationalModalityRequestDTO requestDTO) {
         // Verificar que no exista una modalidad con el mismo nombre
         if (modalityRepository.existsByName(requestDTO.getName())) {
-            throw new IllegalArgumentException("Ya existe una modalidad educativa con el nombre: " + requestDTO.getName());
+            throw new IllegalArgumentException("Ya existe modalidad educativa " + requestDTO.getName());
         }
 
         EducationalModality modality = modalityMapper.toEntity(requestDTO);

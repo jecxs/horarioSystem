@@ -48,7 +48,7 @@ public class EducationalModalityController {
      * @param requestDTO Nuevos datos de la modalidad
      * @return Modalidad educativa actualizada
      */
-    @PutMapping("/{uuid}")
+    @PatchMapping("/{uuid}")
     public ResponseEntity<ApiResponse<EducationalModalityResponseDTO>> updateModality(
             @PathVariable UUID uuid,
             @Valid @RequestBody EducationalModalityRequestDTO requestDTO) {

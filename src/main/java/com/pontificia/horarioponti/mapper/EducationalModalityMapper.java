@@ -25,6 +25,8 @@ public class EducationalModalityMapper {
                 .name(entity.getName())
                 .durationYears(entity.getDurationYears())
                 .description(entity.getDescription())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 
