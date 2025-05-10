@@ -15,6 +15,6 @@ public class CycleEntity extends BaseEntity {
     private Integer number;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "career_id")
+    @JoinColumn(name = "career_id", nullable = false)
     private CareerEntity career;
 }

@@ -46,6 +46,15 @@ public class CareerController {
         );
     }
 
+    /**
+     * Actualiza los datos de una carrera existente. Si se cambia la modalidad,
+     * se actualiza la relación. También pueden eliminarse los ciclos antiguos
+     * si la modalidad cambia (según reglas de negocio futuras).
+     *
+     * @param uuid    UUID de la carrera a actualizar.
+     * @param request Datos de la carrera a modificar (nombre y/o modalidad).
+     * @return Carrera actualizada junto con un mensaje de éxito.
+     */
     @PatchMapping("/{uuid}")
     public ResponseEntity<ApiResponse<CareerResponseDto>> updateCareer(
             @PathVariable UUID uuid,
@@ -54,6 +63,20 @@ public class CareerController {
         CareerResponseDto updated = careerService.updateCareer(uuid, request);
         return ResponseEntity.ok(
                 ApiResponse.success(updated, "Carrera actualizada correctamente")
+        );
+    }
+
+    /**
+     * Elimina una carrera y sus ciclos asociados.
+     *
+     * @param uuid UUID de la carrera a eliminar.
+     * @return Mensaje de éxito si la operación fue completada.
+     */
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<ApiResponse<String>> deleteCareer(@PathVariable UUID uuid) {
+        careerService.deleteCareer(uuid);
+        return ResponseEntity.ok(
+                ApiResponse.success(null, "Carrera eliminada correctamente")
         );
     }
 }

@@ -20,13 +20,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class CareerService extends BaseService<CareerEntity> {
+
     @Autowired
     private EducationalModalityRepository modalityRepository;
 
     @Autowired
     private CareerRepository careerRepository;
 
-
+    /**
+     * Obtiene todas las carreras del sistema en formato DTO.
+     *
+     * @return Lista de objetos CareerResponseDto.
+     */
     public List<CareerResponseDto> getAllCareers() {
         List<CareerEntity> careers = careerRepository.findAll();
         return careers.stream()
@@ -40,7 +45,7 @@ public class CareerService extends BaseService<CareerEntity> {
      *
      * @param name       Nombre de la carrera.
      * @param modalityId UUID de la modalidad educativa asociada.
-     * @return La entidad Career creada, con sus ciclos relacionados.
+     * @return DTO de la carrera creada.
      */
     @Transactional
     public CareerResponseDto createCareer(String name, UUID modalityId) {
@@ -54,24 +59,21 @@ public class CareerService extends BaseService<CareerEntity> {
         CareerEntity career = new CareerEntity();
         career.setName(name);
         career.setModality(modality);
+        career.setCycles(generateCyclesForCareer(career, modality.getDurationYears()));
 
-        int totalCycles = modality.getDurationYears() * 2;
-        List<CycleEntity> cycles = new ArrayList<>();
-
-        for (int i = 1; i <= totalCycles; i++) {
-            CycleEntity cycle = new CycleEntity();
-            cycle.setNumber(i);
-            cycle.setCareer(career);
-            cycles.add(cycle);
-        }
-
-        career.setCycles(cycles);
         CareerEntity savedCareer = careerRepository.save(career);
-
         return CareerMapper.toDto(savedCareer);
     }
 
-
+    /**
+     * Actualiza una carrera existente. Si se cambia la modalidad educativa,
+     * se eliminan los ciclos anteriores y se generan nuevos.
+     *
+     * @param careerId ID de la carrera a editar.
+     * @param request  Objeto DTO con los nuevos valores.
+     * @return DTO de la carrera actualizada.
+     */
+    @Transactional
     public CareerResponseDto updateCareer(UUID careerId, CreateCareerRequestDTO request) {
         CareerEntity career = careerRepository.findById(careerId)
                 .orElseThrow(() -> new EntityNotFoundException("Carrera no encontrada"));
@@ -81,22 +83,32 @@ public class CareerService extends BaseService<CareerEntity> {
         }
 
         if (request.modalityId() != null) {
-            EducationalModalityEntity modality = modalityRepository.findById(request.modalityId())
+            EducationalModalityEntity newModality = modalityRepository.findById(request.modalityId())
                     .orElseThrow(() -> new EntityNotFoundException("Modalidad no encontrada"));
-            career.setModality(modality);
+
+            boolean isDifferentModality = !career.getModality().getUuid().equals(newModality.getUuid());
+
+            if (isDifferentModality) {
+                career.setModality(newModality);
+                career.getCycles().clear();
+
+                List<CycleEntity> newCycles = generateCyclesForCareer(career, newModality.getDurationYears());
+                career.getCycles().addAll(newCycles);
+            }
         }
 
-        CareerEntity updated = careerRepository.save(career);
-        return CareerMapper.toDto(updated);
+        CareerEntity updatedCareer = careerRepository.save(career);
+        return CareerMapper.toDto(updatedCareer);
     }
 
-
-
     /**
-     * Obtiene carreras por modalidad
+     * Obtiene las carreras asociadas a una modalidad educativa.
+     *
+     * @param modalityId UUID de la modalidad educativa.
+     * @return Lista de entidades Career asociadas a la modalidad.
      */
-    public List<CareerEntity> obtenerCarrerasPorModalidad(UUID uuid) {
-        Optional<EducationalModalityEntity> modalidadOpt = modalityRepository.findById(uuid);
+    public List<CareerEntity> obtenerCarrerasPorModalidad(UUID modalityId) {
+        Optional<EducationalModalityEntity> modalidadOpt = modalityRepository.findById(modalityId);
         if (modalidadOpt.isPresent()) {
             EducationalModalityEntity modalidad = modalidadOpt.get();
             return careerRepository.findByModality(modalidad);
@@ -105,46 +117,34 @@ public class CareerService extends BaseService<CareerEntity> {
     }
 
     /**
-     * Obtiene todos los ciclos
+     * Genera la lista de ciclos para una carrera según los años de duración.
+     *
+     * @param career        Carrera a la que pertenecen los ciclos.
+     * @param durationYears Duración en años de la carrera/modalidad.
+     * @return Lista de entidades CycleEntity asociadas a la carrera.
      */
-//    public List<Ciclo> obtenerTodosCiclos() {
-//        return cicloRepository.findAll();
-//    }
+    private List<CycleEntity> generateCyclesForCareer(CareerEntity career, int durationYears) {
+        List<CycleEntity> cycles = new ArrayList<>();
+        for (int i = 1; i <= durationYears * 2; i++) {
+            CycleEntity cycle = new CycleEntity();
+            cycle.setNumber(i);
+            cycle.setCareer(career);
+            cycles.add(cycle);
+        }
+        return cycles;
+    }
 
     /**
-     * Obtiene ciclos por carrera
+     * Elimina una carrera junto con todos sus ciclos relacionados.
+     *
+     * @param careerId UUID de la carrera a eliminar.
+     * @throws EntityNotFoundException si la carrera no existe.
      */
-//    public List<Ciclo> obtenerCiclosPorCarrera(Long carreraId) {
-//        Optional<Carrera> carreraOpt = carreraRepository.findById(carreraId);
-//        if (carreraOpt.isPresent()) {
-//            Carrera carrera = carreraOpt.get();
-//            return cicloRepository.findByCarrera(carrera);
-//        }
-//        return List.of();
-//    }
+    @Transactional
+    public void deleteCareer(UUID careerId) {
+        CareerEntity career = careerRepository.findById(careerId)
+                .orElseThrow(() -> new EntityNotFoundException("Carrera no encontrada"));
 
-    /**
-     * Crea un nuevo ciclo
-     */
-//    @Transactional
-//    public Ciclo crearCiclo(Integer numero, Long carreraId) {
-//        Optional<Carrera> carreraOpt = carreraRepository.findById(carreraId);
-//        if (!carreraOpt.isPresent()) {
-//            return null;
-//        }
-//
-//        Carrera carrera = carreraOpt.get();
-//
-//        if (cicloRepository.existsByNumeroAndCarrera(numero, carrera)) {
-//            return null;
-//        }
-//
-//        Ciclo ciclo = new Ciclo();
-//        ciclo.setNumero(numero);
-//        ciclo.setCarrera(carrera);
-//        ciclo.setCursos(new ArrayList<>());
-//        ciclo.setGrupos(new ArrayList<>());
-//
-//        return cicloRepository.save(ciclo);
-//    }
+        careerRepository.delete(career);
+    }
 }
