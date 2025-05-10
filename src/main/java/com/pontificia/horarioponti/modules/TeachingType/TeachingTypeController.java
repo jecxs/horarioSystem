@@ -1,8 +1,8 @@
 package com.pontificia.horarioponti.modules.TeachingType;
 
 
-import com.pontificia.horarioponti.payload.response.ApiResponse;
-import com.pontificia.horarioponti.payload.response.TeachingTypeResponseDTO;
+import com.pontificia.horarioponti.modules.TeachingType.dto.TeachingTypeResponseDTO;
+import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/teaching-types")
+@RequestMapping("/api/protected/teaching-types")
 public class TeachingTypeController {
 
     private final TeachingTypeService teachingTypeService;

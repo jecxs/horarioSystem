@@ -1,50 +1,59 @@
-plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.4'
-    id 'io.spring.dependency-management' version '1.1.7'
-}
-
-group = 'com.pontificia'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+    plugins {
+        id 'java'
+        id 'org.springframework.boot' version '3.4.4'
+        id 'io.spring.dependency-management' version '1.1.7'
     }
-}
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+    group = 'com.pontificia'
+    version = '0.0.1-SNAPSHOT'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
     }
-}
 
-repositories {
-    mavenCentral()
-}
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    repositories {
+        mavenCentral()
+    }
 
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    implementation 'org.mindrot:jbcrypt:0.4'
+    dependencies {
+        // Spring Boot Starters - Core funcionalidad
+        implementation 'org.springframework.boot:spring-boot-starter-web'                 // Web MVC
+        implementation 'org.springframework.boot:spring-boot-starter-validation'          // Validación de datos
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'            // JPA / Hibernate
 
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+        // Seguridad adicional
+        implementation 'org.mindrot:jbcrypt:0.4'                                           // Encriptación de contraseñas
+        implementation 'org.springframework.boot:spring-boot-starter-security'             // Security
+        implementation 'io.jsonwebtoken:jjwt-api:0.11.5'                                   // JWT - API
+        runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'                                     // JWT - Implementación
+        runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'                                  // JWT - Jackson para serialización
 
-}
+        // Base de datos PostgreSQL
+        implementation 'org.postgresql:postgresql:42.7.3'                                  // Conector para PostgreSQL
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+        // Herramientas de desarrollo
+        developmentOnly 'org.springframework.boot:spring-boot-devtools'                   // Devtools para recarga en caliente
+
+        // Anotaciones
+        compileOnly 'org.projectlombok:lombok'                                             // Lombok para anotaciones
+        annotationProcessor 'org.projectlombok:lombok'                                     // Procesador de anotaciones de Lombok
+
+        // Testing
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'             // Testing con Spring Boot
+        testImplementation 'org.springframework.security:spring-security-test'             // Testing para seguridad
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                       // Lanzador de pruebas JUnit
+    }
+
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }

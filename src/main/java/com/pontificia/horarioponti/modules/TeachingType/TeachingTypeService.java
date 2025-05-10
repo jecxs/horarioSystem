@@ -1,7 +1,7 @@
 package com.pontificia.horarioponti.modules.TeachingType;
 
-import com.pontificia.horarioponti.mapper.TeachingTypeMapper;
-import com.pontificia.horarioponti.payload.response.TeachingTypeResponseDTO;
+import com.pontificia.horarioponti.modules.TeachingType.mapper.TeachingTypeMapper;
+import com.pontificia.horarioponti.modules.TeachingType.dto.TeachingTypeResponseDTO;
 import com.pontificia.horarioponti.utils.abstractBase.BaseRepository;
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
 import jakarta.annotation.PostConstruct;
@@ -22,12 +22,11 @@ public class TeachingTypeService extends BaseService<TeachingType> {
 
     @Autowired
     public TeachingTypeService(TeachingTypeRepository teachingTypeRepository,
-                               TeachingTypeMapper teachingTypeMapper) {
+                              TeachingTypeMapper teachingTypeMapper) {
         this.teachingTypeRepository = teachingTypeRepository;
         this.teachingTypeMapper = teachingTypeMapper;
     }
 
-    @Override
     protected BaseRepository<TeachingType> getRepository() {
         return teachingTypeRepository;
     }
