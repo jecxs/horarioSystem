@@ -1,9 +1,9 @@
-package com.pontificia.horarioponti.modules.auth.service;
+package com.pontificia.horarioponti.modules.auth;
 
 import com.pontificia.horarioponti.modules.auth.dto.JwtResponse;
 import com.pontificia.horarioponti.modules.auth.dto.UserInfoResponse;
 import com.pontificia.horarioponti.utils.jwt.services.JwtService;
-import com.pontificia.horarioponti.modules.user.User;
+import com.pontificia.horarioponti.modules.user.UserEntity;
 import com.pontificia.horarioponti.modules.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -18,7 +18,7 @@ public class AuthService {
     private final UserRepository userRepository;
 
     public JwtResponse authenticate(String username, String password) {
-        User user = userRepository.findByUsername(username)
+        UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (!BCrypt.checkpw(password, user.getPassword())) {

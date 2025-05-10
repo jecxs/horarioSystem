@@ -1,9 +1,9 @@
-package com.pontificia.horarioponti.modules.auth.service;
+package com.pontificia.horarioponti.modules.auth.config;
 
 import com.pontificia.horarioponti.modules.auth.dto.RegisterRequest;
 import com.pontificia.horarioponti.modules.auth.dto.UserInfoResponse;
-import com.pontificia.horarioponti.modules.auth.enums.Role;
-import com.pontificia.horarioponti.modules.user.User;
+import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.modules.user.UserEntity;
 import com.pontificia.horarioponti.modules.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +23,7 @@ public class UserService {
             throw new RuntimeException("El usuario ya existe");
         }
 
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
@@ -40,7 +40,7 @@ public class UserService {
     }
 
     public UserInfoResponse getUserInfo(String username) {
-        User user = userRepository.findByUsername(username)
+        UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         return new UserInfoResponse(

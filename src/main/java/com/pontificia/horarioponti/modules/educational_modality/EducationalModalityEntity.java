@@ -9,10 +9,7 @@ import lombok.*;
 @Table(name = "educational_modality")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class EducationalModality extends BaseEntity {
+public class EducationalModalityEntity extends BaseEntity {
 
     @Column(nullable = false, length = 100, unique = true)
     private String name;
@@ -22,9 +19,4 @@ public class EducationalModality extends BaseEntity {
 
     @Lob
     private String description;
-
-   // @OneToMany(mappedBy = "modalidad", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-   // @JsonIgnore
-   // private List<Carrera> carreras = new ArrayList<>();
-
 }

@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti.modules.auth.service;
+package com.pontificia.horarioponti.modules.auth.config;
 
 import com.pontificia.horarioponti.modules.user.UserRepository;
 import lombok.RequiredArgsConstructor;

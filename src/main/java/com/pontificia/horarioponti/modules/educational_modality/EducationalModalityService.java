@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.modules.educational_modality;
 
-import com.pontificia.horarioponti.mapper.EducationalModalityMapper;
+import com.pontificia.horarioponti.modules.educational_modality.mapper.EducationalModalityMapper;
 import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityRequestDTO;
 import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityResponseDTO;
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class EducationalModalityService extends BaseService<EducationalModality> {
+public class EducationalModalityService extends BaseService<EducationalModalityEntity> {
     @Autowired
     private EducationalModalityRepository modalityRepository;
 
@@ -21,12 +21,12 @@ public class EducationalModalityService extends BaseService<EducationalModality>
     private EducationalModalityMapper modalityMapper;
 
     public List<EducationalModalityResponseDTO> getAllModalities() {
-        List<EducationalModality> modalities = findAll();
+        List<EducationalModalityEntity> modalities = findAll();
         return modalityMapper.toResponseDTOList(modalities);
     }
 
     public EducationalModalityResponseDTO getModalityById(UUID uuid) {
-        EducationalModality modality = findModalityOrThrow(uuid);
+        EducationalModalityEntity modality = findModalityOrThrow(uuid);
         return modalityMapper.toResponseDTO(modality);
     }
 
@@ -37,15 +37,15 @@ public class EducationalModalityService extends BaseService<EducationalModality>
             throw new IllegalArgumentException("Ya existe modalidad educativa " + requestDTO.getName());
         }
 
-        EducationalModality modality = modalityMapper.toEntity(requestDTO);
-        EducationalModality savedModality = save(modality);
+        EducationalModalityEntity modality = modalityMapper.toEntity(requestDTO);
+        EducationalModalityEntity savedModality = save(modality);
 
         return modalityMapper.toResponseDTO(savedModality);
     }
 
     @Transactional
     public EducationalModalityResponseDTO updateModality(UUID uuid, EducationalModalityRequestDTO requestDTO) {
-        EducationalModality modality = findModalityOrThrow(uuid);
+        EducationalModalityEntity modality = findModalityOrThrow(uuid);
 
         // Verificar que no exista otra modalidad con el mismo nombre (excepto esta misma)
         if (!modality.getName().equals(requestDTO.getName()) &&
@@ -54,19 +54,19 @@ public class EducationalModalityService extends BaseService<EducationalModality>
         }
 
         modalityMapper.updateEntityFromDTO(requestDTO, modality);
-        EducationalModality updatedModality = update(modality);
+        EducationalModalityEntity updatedModality = update(modality);
 
         return modalityMapper.toResponseDTO(updatedModality);
     }
 
     @Transactional
     public void deleteModality(UUID uuid) {
-        EducationalModality modality = findModalityOrThrow(uuid);
+        EducationalModalityEntity modality = findModalityOrThrow(uuid);
 
         deleteById(uuid);
     }
 
-    private EducationalModality findModalityOrThrow(UUID uuid) {
+    private EducationalModalityEntity findModalityOrThrow(UUID uuid) {
         return findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Modalidad educativa no encontrada con ID: " + uuid));
     }

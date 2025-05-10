@@ -10,11 +10,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends BaseRepository<User> {
-    Optional<User> findByUsername(String username);
+public interface UserRepository extends BaseRepository<UserEntity> {
+    Optional<UserEntity> findByUsername(String username);
 
     boolean existsByUsername(String username);
 
     @Query(value = "SELECT * FROM user WHERE uuid = :uuid", nativeQuery = true)
-    Optional<User> findSomethingCustom(@Param("uuid") UUID uuid);
+    Optional<UserEntity> findSomethingCustom(@Param("uuid") UUID uuid);
 }

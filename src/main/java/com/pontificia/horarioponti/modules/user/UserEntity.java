@@ -1,11 +1,9 @@
 package com.pontificia.horarioponti.modules.user;
 
-import com.pontificia.horarioponti.modules.auth.enums.Role;
+import com.pontificia.horarioponti.enums.Role;
 import com.pontificia.horarioponti.utils.abstractBase.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,9 +18,7 @@ import java.util.List;
 })
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class User extends BaseEntity implements UserDetails {
+public class UserEntity extends BaseEntity implements UserDetails {
     @Column(unique = true, nullable = false)
     private String username;
 

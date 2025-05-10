@@ -1,7 +1,7 @@
 package com.pontificia.horarioponti.utils.jwt.services;
 
 
-import com.pontificia.horarioponti.modules.auth.enums.Role;
+import com.pontificia.horarioponti.enums.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

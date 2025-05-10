@@ -1,11 +1,10 @@
-package com.pontificia.horarioponti.modules.auth.controller;
+package com.pontificia.horarioponti.modules.auth;
 
+import com.pontificia.horarioponti.modules.auth.config.UserService;
 import com.pontificia.horarioponti.modules.auth.dto.JwtResponse;
 import com.pontificia.horarioponti.modules.auth.dto.LoginRequest;
 import com.pontificia.horarioponti.modules.auth.dto.RegisterRequest;
 import com.pontificia.horarioponti.modules.auth.dto.UserInfoResponse;
-import com.pontificia.horarioponti.modules.auth.service.AuthService;
-import com.pontificia.horarioponti.modules.auth.service.UserService;
 import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
