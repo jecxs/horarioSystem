@@ -1,7 +1,7 @@
-package com.pontificia.horarioponti.modules.TeachingType.mapper;
+package com.pontificia.horarioponti.modules.teaching_type.mapper;
 
-import com.pontificia.horarioponti.modules.TeachingType.TeachingType;
-import com.pontificia.horarioponti.modules.TeachingType.dto.TeachingTypeResponseDTO;
+import com.pontificia.horarioponti.modules.teaching_type.TeachingType;
+import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public class TeachingTypeMapper {
 
         return TeachingTypeResponseDTO.builder()
                 .uuid(entity.getUuid())
-                .name(entity.getName())
+                .name(entity.getName().name())
                 .build();
     }
 

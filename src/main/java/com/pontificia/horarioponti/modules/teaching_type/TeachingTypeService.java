@@ -1,7 +1,8 @@
-package com.pontificia.horarioponti.modules.TeachingType;
+package com.pontificia.horarioponti.modules.teaching_type;
 
-import com.pontificia.horarioponti.modules.TeachingType.mapper.TeachingTypeMapper;
-import com.pontificia.horarioponti.modules.TeachingType.dto.TeachingTypeResponseDTO;
+import com.pontificia.horarioponti.enums.ETeachingType;
+import com.pontificia.horarioponti.modules.teaching_type.mapper.TeachingTypeMapper;
+import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
 import com.pontificia.horarioponti.utils.abstractBase.BaseRepository;
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
 import jakarta.annotation.PostConstruct;
@@ -37,10 +38,10 @@ public class TeachingTypeService extends BaseService<TeachingType> {
     public void initializeTeachingTypes() {
         if (teachingTypeRepository.count() == 0) {
             TeachingType theoretical = new TeachingType();
-            theoretical.setName("TEORÍA");
+            theoretical.setName(ETeachingType.TEORY);
 
             TeachingType practical = new TeachingType();
-            practical.setName("PRÁCTICA");
+            practical.setName(ETeachingType.PRACTICE);
 
             saveAll(Arrays.asList(theoretical, practical));
         }

@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti.modules.TeachingType;
+package com.pontificia.horarioponti.modules.teaching_type;
 
 import com.pontificia.horarioponti.utils.abstractBase.BaseRepository;
 import org.springframework.stereotype.Repository;

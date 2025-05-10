@@ -1,7 +1,7 @@
-package com.pontificia.horarioponti.modules.TeachingType;
+package com.pontificia.horarioponti.modules.teaching_type;
 
 
-import com.pontificia.horarioponti.modules.TeachingType.dto.TeachingTypeResponseDTO;
+import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
 import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

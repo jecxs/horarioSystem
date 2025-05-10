@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti.modules.TeachingType.dto;
+package com.pontificia.horarioponti.modules.teaching_type.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
