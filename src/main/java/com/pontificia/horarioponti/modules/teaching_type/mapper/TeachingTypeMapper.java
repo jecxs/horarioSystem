@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.modules.teaching_type.mapper;
 
-import com.pontificia.horarioponti.modules.teaching_type.TeachingType;
+import com.pontificia.horarioponti.modules.teaching_type.TeachingTypeEntity;
 import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class TeachingTypeMapper {
-    public TeachingTypeResponseDTO toResponseDTO(TeachingType entity) {
+    public TeachingTypeResponseDTO toResponseDTO(TeachingTypeEntity entity) {
         if (entity == null) return null;
 
         return TeachingTypeResponseDTO.builder()
@@ -18,7 +18,7 @@ public class TeachingTypeMapper {
                 .build();
     }
 
-    public List<TeachingTypeResponseDTO> toResponseDTOList(List<TeachingType> entities) {
+    public List<TeachingTypeResponseDTO> toResponseDTOList(List<TeachingTypeEntity> entities) {
         return entities.stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());

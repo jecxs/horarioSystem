@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class TeachingTypeService extends BaseService<TeachingType> {
+public class TeachingTypeService extends BaseService<TeachingTypeEntity> {
 
     private final TeachingTypeRepository teachingTypeRepository;
     private final TeachingTypeMapper teachingTypeMapper;
@@ -28,7 +28,7 @@ public class TeachingTypeService extends BaseService<TeachingType> {
         this.teachingTypeMapper = teachingTypeMapper;
     }
 
-    protected BaseRepository<TeachingType> getRepository() {
+    protected BaseRepository<TeachingTypeEntity> getRepository() {
         return teachingTypeRepository;
     }
 
@@ -37,10 +37,10 @@ public class TeachingTypeService extends BaseService<TeachingType> {
     @Transactional
     public void initializeTeachingTypes() {
         if (teachingTypeRepository.count() == 0) {
-            TeachingType theoretical = new TeachingType();
+            TeachingTypeEntity theoretical = new TeachingTypeEntity();
             theoretical.setName(ETeachingType.THEORY);
 
-            TeachingType practical = new TeachingType();
+            TeachingTypeEntity practical = new TeachingTypeEntity();
             practical.setName(ETeachingType.PRACTICE);
 
             saveAll(Arrays.asList(theoretical, practical));
@@ -48,16 +48,16 @@ public class TeachingTypeService extends BaseService<TeachingType> {
     }
 
     public List<TeachingTypeResponseDTO> getAllTeachingTypes() {
-        List<TeachingType> types = findAll();
+        List<TeachingTypeEntity> types = findAll();
         return teachingTypeMapper.toResponseDTOList(types);
     }
 
     public TeachingTypeResponseDTO getTeachingTypeById(UUID uuid) {
-        TeachingType type = findTeachingTypeOrThrow(uuid);
+        TeachingTypeEntity type = findTeachingTypeOrThrow(uuid);
         return teachingTypeMapper.toResponseDTO(type);
     }
 
-    public TeachingType findTeachingTypeOrThrow(UUID uuid) {
+    public TeachingTypeEntity findTeachingTypeOrThrow(UUID uuid) {
         return findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Teaching type not found with ID: " + uuid));
     }
@@ -67,7 +67,7 @@ public class TeachingTypeService extends BaseService<TeachingType> {
      * Guarda una colección de tipos de enseñanza
      */
     @Transactional
-    public List<TeachingType> saveAll(List<TeachingType> types) {
+    public List<TeachingTypeEntity> saveAll(List<TeachingTypeEntity> types) {
         return teachingTypeRepository.saveAll(types);
     }
 }

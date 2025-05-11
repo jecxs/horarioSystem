@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TeachingTypeRepository extends BaseRepository<TeachingType> {
-    Optional<TeachingType> findByName(String name);
+public interface TeachingTypeRepository extends BaseRepository<TeachingTypeEntity> {
+    Optional<TeachingTypeEntity> findByName(String name);
     boolean existsByName(String name);
 
 }
