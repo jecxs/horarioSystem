@@ -9,7 +9,7 @@ import com.pontificia.horarioponti.modules.educational_modality.EducationalModal
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,13 +19,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CareerService extends BaseService<CareerEntity> {
 
-    @Autowired
-    private EducationalModalityRepository modalityRepository;
-
-    @Autowired
-    private CareerRepository careerRepository;
+    private final EducationalModalityRepository modalityRepository;
+    private final CareerRepository careerRepository;
 
     /**
      * Obtiene todas las carreras del sistema en formato DTO.

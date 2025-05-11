@@ -5,7 +5,6 @@ import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
 import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +16,14 @@ import java.util.UUID;
 @RequestMapping("/api/protected/educational-modalities")
 @RequiredArgsConstructor
 public class EducationalModalityController {
-    @Autowired
+
     private final EducationalModalityService modalityService;
 
     /**
-     * @return Lista de modalidades educativas
+     * Obtiene todas las modalidades educativas registradas.
+     *
+     * @return {@link ResponseEntity} con una lista de {@link EducationalModalityResponseDTO}
+     *         y un mensaje de éxito dentro de un objeto {@link ApiResponse}.
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<EducationalModalityResponseDTO>>> getAllModalities() {
@@ -32,8 +34,11 @@ public class EducationalModalityController {
     }
 
     /**
-     * @param requestDTO Datos de la modalidad a crear
-     * @return Modalidad educativa creada
+     * Crea una nueva modalidad educativa a partir del objeto recibido en el cuerpo de la solicitud.
+     *
+     * @param requestDTO Objeto con los datos de la nueva modalidad.
+     * @return {@link ResponseEntity} con el objeto creado {@link EducationalModalityResponseDTO}
+     *         y un mensaje de éxito dentro de un objeto {@link ApiResponse}.
      */
     @PostMapping
     public ResponseEntity<ApiResponse<EducationalModalityResponseDTO>> createModality(
@@ -44,9 +49,12 @@ public class EducationalModalityController {
     }
 
     /**
-     * @param uuid       ID de la modalidad a actualizar
-     * @param requestDTO Nuevos datos de la modalidad
-     * @return Modalidad educativa actualizada
+     * Actualiza una modalidad educativa existente.
+     *
+     * @param uuid       Identificador único de la modalidad a actualizar.
+     * @param requestDTO Nuevos datos que reemplazarán a los actuales.
+     * @return {@link ResponseEntity} con el objeto actualizado {@link EducationalModalityResponseDTO}
+     *         y un mensaje de éxito dentro de un objeto {@link ApiResponse}.
      */
     @PatchMapping("/{uuid}")
     public ResponseEntity<ApiResponse<EducationalModalityResponseDTO>> updateModality(
@@ -59,8 +67,10 @@ public class EducationalModalityController {
     }
 
     /**
-     * @param uuid ID de la modalidad a eliminar
-     * @return Respuesta sin contenido
+     * Elimina una modalidad educativa identificada por su UUID.
+     *
+     * @param uuid Identificador único de la modalidad a eliminar.
+     * @return {@link ResponseEntity} sin contenido, pero con mensaje de éxito dentro de {@link ApiResponse}.
      */
     @DeleteMapping("/{uuid}")
     public ResponseEntity<ApiResponse<Void>> deleteModality(@PathVariable UUID uuid) {

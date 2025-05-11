@@ -15,6 +15,7 @@ import java.util.UUID;
 @RequestMapping("/api/protected/career")
 @RequiredArgsConstructor
 public class CareerController {
+
     private final CareerService careerService;
 
     /**

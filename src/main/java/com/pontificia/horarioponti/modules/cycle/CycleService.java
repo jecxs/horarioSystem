@@ -1,13 +1,14 @@
 package com.pontificia.horarioponti.modules.cycle;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CycleService {
-    @Autowired
-    CycleRepository cycleRepository;
+
+    private final CycleRepository cycleRepository;
 
     /**
      * Crea un nuevo ciclo académico.

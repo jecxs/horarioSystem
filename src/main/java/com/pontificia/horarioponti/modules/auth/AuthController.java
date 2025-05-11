@@ -18,9 +18,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-
     private final UserService userService;
 
+    /**
+     * Inicia sesión de un usuario autenticado.
+     *
+     * @param request Contiene el nombre de usuario y la contraseña.
+     * @return Una respuesta con el token JWT y la información del usuario.
+     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<JwtResponse>> login(@RequestBody LoginRequest request) {
         try {
@@ -37,6 +42,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Registra un nuevo usuario docente en el sistema.
+     *
+     * @param request Datos del nuevo usuario (nombre, correo, contraseña, etc.).
+     * @return Una respuesta con un mensaje de éxito o error.
+     */
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> registerTeacher(@RequestBody @Valid RegisterRequest request) {
         try {
@@ -49,6 +60,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Devuelve la información del usuario autenticado.
+     *
+     * @param token Token JWT incluido en la cabecera Authorization.
+     * @return Una respuesta con los datos del usuario autenticado.
+     */
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@RequestHeader(value = "Authorization", required = false) String token) {
         if (token == null || !token.startsWith("Bearer ")) {

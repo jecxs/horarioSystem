@@ -3,6 +3,7 @@ package com.pontificia.horarioponti.modules.teaching_type;
 
 import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
 import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,17 +16,16 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/protected/teaching-types")
+@RequiredArgsConstructor
 public class TeachingTypeController {
 
     private final TeachingTypeService teachingTypeService;
 
-    @Autowired
-    public TeachingTypeController(TeachingTypeService teachingTypeService) {
-        this.teachingTypeService = teachingTypeService;
-    }
-
     /**
-     * Obtiene todos los tipos de enseñanza
+     * Endpoint para obtener todos los tipos de enseñanza registrados.
+     *
+     * @return {@link ResponseEntity} con una respuesta estándar {@link ApiResponse}
+     *         que contiene una lista de {@link TeachingTypeResponseDTO}.
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<TeachingTypeResponseDTO>>> getAllTeachingTypes() {
@@ -36,7 +36,11 @@ public class TeachingTypeController {
     }
 
     /**
-     * Obtiene un tipo de enseñanza por ID
+     * Endpoint para obtener un tipo de enseñanza específico por su ID.
+     *
+     * @param uuid Identificador único del tipo de enseñanza.
+     * @return {@link ResponseEntity} con una respuesta estándar {@link ApiResponse}
+     *         que contiene un {@link TeachingTypeResponseDTO}.
      */
     @GetMapping("/{uuid}")
     public ResponseEntity<ApiResponse<TeachingTypeResponseDTO>> getTeachingTypeById(

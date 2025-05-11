@@ -6,19 +6,18 @@ import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalM
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class EducationalModalityService extends BaseService<EducationalModalityEntity> {
-    @Autowired
-    private EducationalModalityRepository modalityRepository;
 
-    @Autowired
-    private EducationalModalityMapper modalityMapper;
+    private final EducationalModalityRepository modalityRepository;
+    private final EducationalModalityMapper modalityMapper;
 
     public List<EducationalModalityResponseDTO> getAllModalities() {
         List<EducationalModalityEntity> modalities = findAll();

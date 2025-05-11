@@ -38,7 +38,7 @@ public class TeachingTypeService extends BaseService<TeachingType> {
     public void initializeTeachingTypes() {
         if (teachingTypeRepository.count() == 0) {
             TeachingType theoretical = new TeachingType();
-            theoretical.setName(ETeachingType.TEORY);
+            theoretical.setName(ETeachingType.THEORY);
 
             TeachingType practical = new TeachingType();
             practical.setName(ETeachingType.PRACTICE);

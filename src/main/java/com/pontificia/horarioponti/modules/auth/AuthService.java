@@ -14,9 +14,16 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final JwtService jwtService;
-
     private final UserRepository userRepository;
 
+    /**
+     * Auténtica a un usuario verificando sus credenciales.
+     *
+     * @param username Nombre de usuario ingresado.
+     * @param password Contraseña proporcionada por el usuario.
+     * @return Un {@link JwtResponse} que contiene el token generado y la información del usuario.
+     * @throws RuntimeException Si el usuario no existe o las credenciales son inválidas.
+     */
     public JwtResponse authenticate(String username, String password) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -32,6 +39,12 @@ public class AuthService {
         return new JwtResponse(token, userInfo);
     }
 
+    /**
+     * Extrae el nombre de usuario desde un token JWT.
+     *
+     * @param token Token JWT válido.
+     * @return El nombre de usuario contenido en el token.
+     */
     public String getUsernameFromToken(String token) {
         return jwtService.getUsernameFromToken(token);
     }
