@@ -27,6 +27,6 @@ public class TeacherEntity extends BaseEntity {
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "specialty_id")
+    @JoinColumn(name = "specialty_id", referencedColumnName = "uuid")
     private SpecialtyEntity specialty;
 }

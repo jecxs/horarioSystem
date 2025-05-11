@@ -10,9 +10,6 @@ import lombok.*;
 @Table(name = "teaching_type")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class TeachingTypeEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)

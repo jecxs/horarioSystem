@@ -26,6 +26,6 @@ public class TimeBlockEntity extends BaseEntity {
     private int duration = 45;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shift_id", nullable = false)
+    @JoinColumn(name = "shift_id", referencedColumnName = "uuid", nullable = false)
     private ShiftEntity shift;
 }

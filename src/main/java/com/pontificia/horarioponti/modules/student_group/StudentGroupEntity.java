@@ -15,6 +15,6 @@ public class StudentGroupEntity extends BaseEntity {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "cycle_id", referencedColumnName = "id_term")
+    @JoinColumn(name = "cycle_id", referencedColumnName = "uuid")
     private CycleEntity cycle;
 }

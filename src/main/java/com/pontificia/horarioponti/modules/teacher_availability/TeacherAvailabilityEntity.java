@@ -25,6 +25,6 @@ public class TeacherAvailabilityEntity extends BaseEntity {
     private LocalTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id", nullable = false)
+    @JoinColumn(name = "teacher_id", referencedColumnName = "uuid", nullable = false)
     private TeacherEntity teacher;
 }
