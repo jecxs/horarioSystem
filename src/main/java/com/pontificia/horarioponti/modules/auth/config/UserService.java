@@ -2,7 +2,7 @@ package com.pontificia.horarioponti.modules.auth.config;
 
 import com.pontificia.horarioponti.modules.auth.dto.RegisterRequest;
 import com.pontificia.horarioponti.modules.auth.dto.UserInfoResponse;
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.enums.ERole;
 import com.pontificia.horarioponti.modules.user.UserEntity;
 import com.pontificia.horarioponti.modules.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class UserService {
         user.setDocumentNumber(request.getDocumentNumber());
 
         if (request.getRole() == null) {
-            user.setRole(Role.TEACHER);
+            user.setRole(ERole.TEACHER);
         } else {
             user.setRole(request.getRole());
         }

@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.modules.auth.dto;
 
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.enums.ERole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,7 +22,7 @@ public class RegisterRequest {
             message = "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número")
     private String password;
 
-    private Role role;
+    private ERole role;
 
     @NotBlank(message = "El primer nombre no puede estar vacío")
     @Pattern(regexp = "^[a-zA-Z]+$", message = "El primer nombre solo puede contener letras")

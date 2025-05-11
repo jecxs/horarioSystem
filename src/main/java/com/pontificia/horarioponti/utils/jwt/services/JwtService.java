@@ -1,7 +1,7 @@
 package com.pontificia.horarioponti.utils.jwt.services;
 
 
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.enums.ERole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -27,17 +27,17 @@ public class JwtService {
     @Value("${app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    private static final Role DEFAULT_ROLE = Role.TEACHER;
+    private static final ERole DEFAULT_ROLE = ERole.TEACHER;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
     public String generateToken(UUID userId, String username, String roleStr) {
-        Role userRole;
+        ERole userRole;
         try {
             userRole = (roleStr != null && !roleStr.isEmpty())
-                    ? Role.valueOf(roleStr)
+                    ? ERole.valueOf(roleStr)
                     : DEFAULT_ROLE;
         } catch (IllegalArgumentException e) {
             userRole = DEFAULT_ROLE;

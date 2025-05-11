@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.modules.user;
 
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.enums.ERole;
 import com.pontificia.horarioponti.utils.abstractBase.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private ERole role;
 
     @Column(nullable = false, unique = true, name = "document_number")
     private String documentNumber;

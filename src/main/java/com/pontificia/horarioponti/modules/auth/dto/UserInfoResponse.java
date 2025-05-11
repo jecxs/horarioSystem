@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.modules.auth.dto;
 
-import com.pontificia.horarioponti.enums.Role;
+import com.pontificia.horarioponti.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ public class UserInfoResponse {
 
     private UUID uuid;
     private String username;
-    private Role role;
+    private ERole role;
     private String firstName;
     private String lastName;
     private String documentNumber;

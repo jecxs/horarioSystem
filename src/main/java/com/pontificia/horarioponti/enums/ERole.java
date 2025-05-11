@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.enums;
 
-public enum Role {
+public enum ERole {
 
     SUPER_ADMIN,
     ADMIN,
