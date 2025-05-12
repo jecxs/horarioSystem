@@ -1,9 +1,8 @@
 package com.pontificia.horarioponti.utils.abstractBase;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,5 +33,10 @@ public abstract class BaseService<T> {
 
     public void deleteById(UUID id) {
         baseRepository.deleteById(id);
+    }
+
+    public T findOrThrow(@NotEmpty UUID uuid) {
+        return findById(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Entidad no encontrada con ID: " + uuid));
     }
 }

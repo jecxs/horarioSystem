@@ -18,6 +18,6 @@ public class LearningSpaceEntity extends BaseEntity {
     private Integer capacity;
 
     @OneToOne
-    @JoinColumn(name = "type_id", referencedColumnName = "uuid", unique = true)
-    private TeachingTypeEntity type;
+    @JoinColumn(name = "type_uuid", referencedColumnName = "uuid", unique = true)
+    private TeachingTypeEntity typeUUID;
 }

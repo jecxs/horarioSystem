@@ -25,7 +25,7 @@ public class JwtService {
     private String jwtSecret;
 
     @Value("${app.jwtExpirationMs}")
-    private int jwtExpirationMs;
+    private long jwtExpirationMs;
 
     private static final ERole DEFAULT_ROLE = ERole.TEACHER;
 

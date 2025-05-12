@@ -31,7 +31,6 @@ public class EducationalModalityService extends BaseService<EducationalModalityE
 
     @Transactional
     public EducationalModalityResponseDTO createModality(EducationalModalityRequestDTO requestDTO) {
-        // Verificar que no exista una modalidad con el mismo nombre
         if (modalityRepository.existsByName(requestDTO.getName())) {
             throw new IllegalArgumentException("Ya existe modalidad educativa " + requestDTO.getName());
         }
@@ -46,7 +45,6 @@ public class EducationalModalityService extends BaseService<EducationalModalityE
     public EducationalModalityResponseDTO updateModality(UUID uuid, EducationalModalityRequestDTO requestDTO) {
         EducationalModalityEntity modality = findModalityOrThrow(uuid);
 
-        // Verificar que no exista otra modalidad con el mismo nombre (excepto esta misma)
         if (!modality.getName().equals(requestDTO.getName()) &&
                 modalityRepository.existsByName(requestDTO.getName())) {
             throw new IllegalArgumentException("Ya existe otra modalidad educativa con el nombre: " + requestDTO.getName());
