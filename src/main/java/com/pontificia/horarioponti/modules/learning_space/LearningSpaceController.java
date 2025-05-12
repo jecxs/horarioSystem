@@ -1,6 +1,6 @@
 package com.pontificia.horarioponti.modules.learning_space;
 
-import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
+import com.pontificia.horarioponti.config.ApiResponse;
 import com.pontificia.horarioponti.modules.learning_space.dto.LearningSpaceRequestDTO;
 import com.pontificia.horarioponti.modules.learning_space.dto.LearningSpaceResponseDTO;
 import jakarta.validation.Valid;

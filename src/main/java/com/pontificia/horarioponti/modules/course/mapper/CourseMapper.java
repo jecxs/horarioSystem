@@ -1,6 +1,7 @@
 package com.pontificia.horarioponti.modules.course.mapper;
 
 
+import com.pontificia.horarioponti.enums.ETeachingType;
 import com.pontificia.horarioponti.modules.course.CourseEntity;
 import com.pontificia.horarioponti.modules.course.dto.CourseRequestDTO;
 import com.pontificia.horarioponti.modules.course.dto.CourseResponseDTO;
@@ -35,7 +36,7 @@ public class CourseMapper {
                 .uuid(entity.getUuid())
                 .name(entity.getName())
                 .weeklyHours(entity.getWeeklyHours())
-                .courseType(courseType)
+                .courseType(ETeachingType.valueOf(courseType))
                 .teachingTypes(teachingTypeMapper.toResponseDTOList(
                         entity.getTeachingTypes().stream().toList()))
                 .cycleUuid(entity.getCycle().getUuid())

@@ -5,18 +5,19 @@ import com.pontificia.horarioponti.modules.learning_space.dto.LearningSpaceRespo
 import com.pontificia.horarioponti.modules.learning_space.mapper.LearningSpaceMapper;
 import com.pontificia.horarioponti.utils.abstractBase.BaseService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class LearningSpaceService extends BaseService<LearningSpaceEntity> {
-    private final LearningSpaceRepository learningSpaceRepository;
     private final LearningSpaceMapper learningSpaceMapper;
+
+    public LearningSpaceService(LearningSpaceRepository learningSpaceRepository, LearningSpaceMapper learningSpaceMapper) {
+        super(learningSpaceRepository);
+        this.learningSpaceMapper = learningSpaceMapper;
+    }
 
     public List<LearningSpaceResponseDTO> getAllLearningSpaces() {
         List<LearningSpaceEntity> modalities = findAll();
@@ -43,8 +44,7 @@ public class LearningSpaceService extends BaseService<LearningSpaceEntity> {
 
     @Transactional
     public void deleteLearningSpace(UUID uuid) {
-        LearningSpaceEntity learningSpace = findOrThrow(uuid);
-
+        findOrThrow(uuid);
         deleteById(uuid);
     }
 }

@@ -150,7 +150,7 @@ public class CourseService extends BaseService<CourseEntity> {
     }
 
     /**
-     * Obtiene las entidades TeachingType a partir de una lista de UUIDs
+     * Obtiene las entidades TeachingType a partir de una lista de UUID
      */
     private Set<TeachingTypeEntity> getTeachingTypesFromUuids(List<UUID> teachingTypeUuids) {
         return teachingTypeUuids.stream()

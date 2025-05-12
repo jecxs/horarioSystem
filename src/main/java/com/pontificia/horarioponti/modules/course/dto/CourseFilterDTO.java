@@ -1,14 +1,14 @@
 package com.pontificia.horarioponti.modules.course.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class CourseFilterDTO {
     private UUID modalityUuid;
     private UUID careerUuid;
