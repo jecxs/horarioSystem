@@ -1,4 +1,4 @@
-package com.pontificia.horarioponti.modules.educational_modality.dto;
+package com.pontificia.horarioponti.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

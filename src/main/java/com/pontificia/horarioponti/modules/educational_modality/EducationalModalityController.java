@@ -1,7 +1,7 @@
 package com.pontificia.horarioponti.modules.educational_modality;
 
 import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityRequestDTO;
-import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
+import com.pontificia.horarioponti.config.ApiResponse;
 import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
