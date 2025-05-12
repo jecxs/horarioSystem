@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
+
 public abstract class BaseService<T> {
 
-    @Autowired
-    protected BaseRepository<T> baseRepository;
+    protected final BaseRepository<T> baseRepository;
+
+    public BaseService(BaseRepository<T> baseRepository) {
+        this.baseRepository = baseRepository;
+    }
 
     public List<T> findAll() {
         return baseRepository.findAll();

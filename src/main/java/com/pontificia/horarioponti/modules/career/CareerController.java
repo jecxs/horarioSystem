@@ -2,7 +2,7 @@ package com.pontificia.horarioponti.modules.career;
 
 import com.pontificia.horarioponti.modules.career.dto.CareerResponseDto;
 import com.pontificia.horarioponti.modules.career.dto.CreateCareerRequestDTO;
-import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
+import com.pontificia.horarioponti.config.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
