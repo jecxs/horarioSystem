@@ -23,13 +23,10 @@ public class TeachingTypeService extends BaseService<TeachingTypeEntity> {
 
     @Autowired
     public TeachingTypeService(TeachingTypeRepository teachingTypeRepository,
-                              TeachingTypeMapper teachingTypeMapper) {
+                               TeachingTypeMapper teachingTypeMapper) {
+        super(teachingTypeRepository);
         this.teachingTypeRepository = teachingTypeRepository;
         this.teachingTypeMapper = teachingTypeMapper;
-    }
-
-    protected BaseRepository<TeachingTypeEntity> getRepository() {
-        return teachingTypeRepository;
     }
 
     // Inicialización de tipos básicos

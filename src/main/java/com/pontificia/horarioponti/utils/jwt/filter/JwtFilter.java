@@ -2,7 +2,7 @@ package com.pontificia.horarioponti.utils.jwt.filter;
 
 import com.pontificia.horarioponti.utils.jwt.services.CustomUserDetailsService;
 import com.pontificia.horarioponti.utils.jwt.services.JwtService;
-import com.pontificia.horarioponti.modules.educational_modality.dto.ApiResponse;
+import com.pontificia.horarioponti.config.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

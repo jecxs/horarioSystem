@@ -13,11 +13,18 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class EducationalModalityService extends BaseService<EducationalModalityEntity> {
 
     private final EducationalModalityRepository modalityRepository;
     private final EducationalModalityMapper modalityMapper;
+
+    public EducationalModalityService(EducationalModalityRepository modalityRepository,
+                                      EducationalModalityMapper modalityMapper) {
+        super(modalityRepository);
+        this.modalityRepository = modalityRepository;
+        this.modalityMapper = modalityMapper;
+    }
+
 
     public List<EducationalModalityResponseDTO> getAllModalities() {
         List<EducationalModalityEntity> modalities = findAll();

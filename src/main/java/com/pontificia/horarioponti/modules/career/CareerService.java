@@ -19,11 +19,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CareerService extends BaseService<CareerEntity> {
 
     private final EducationalModalityRepository modalityRepository;
     private final CareerRepository careerRepository;
+
+    public CareerService(CareerRepository careerRepository,
+                         EducationalModalityRepository modalityRepository) {
+        super(careerRepository);
+        this.careerRepository = careerRepository;
+        this.modalityRepository = modalityRepository;
+    }
 
     /**
      * Obtiene todas las carreras del sistema en formato DTO.
