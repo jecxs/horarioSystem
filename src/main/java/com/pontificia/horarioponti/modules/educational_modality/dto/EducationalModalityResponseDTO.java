@@ -9,8 +9,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EducationalModalityResponseDTO {
     private UUID uuid;

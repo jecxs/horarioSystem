@@ -5,6 +5,7 @@ import com.pontificia.horarioponti.modules.learning_space.dto.LearningSpaceReque
 import com.pontificia.horarioponti.modules.learning_space.dto.LearningSpaceResponseDTO;
 import com.pontificia.horarioponti.modules.teaching_type.TeachingTypeEntity;
 import com.pontificia.horarioponti.modules.teaching_type.TeachingTypeService;
+import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,8 +32,7 @@ public class LearningSpaceMapper {
                 .uuid(entity.getUuid())
                 .name(entity.getName())
                 .capacity(entity.getCapacity())
-                .typeUUID(entity.getTypeUUID() != null ? entity.getTypeUUID().getUuid() : null)
-                .typeName(entity.getTypeUUID() != null ? String.valueOf(entity.getTypeUUID().getName()) : null)
+                .teachingType(TeachingTypeResponseDTO.builder().build())
                 .build();
     }
 

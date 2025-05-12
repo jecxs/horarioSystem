@@ -13,7 +13,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CourseRequestDTO {
-
     @NotBlank(message = "El nombre del curso es obligatorio")
     private String name;
 

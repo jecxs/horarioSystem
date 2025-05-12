@@ -1,6 +1,9 @@
 package com.pontificia.horarioponti.modules.course.dto;
 
 import com.pontificia.horarioponti.enums.ETeachingType;
+import com.pontificia.horarioponti.modules.career.dto.CareerResponseDto;
+import com.pontificia.horarioponti.modules.cycle.dto.CycleResponseDTO;
+import com.pontificia.horarioponti.modules.educational_modality.dto.EducationalModalityResponseDTO;
 import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,12 +22,7 @@ public class CourseResponseDTO {
     private ETeachingType courseType;
     private List<TeachingTypeResponseDTO> teachingTypes;
 
-    private UUID cycleUuid;
-    private String cycleNumber;
-
-    private UUID careerUuid;
-    private String careerName;
-
-    private UUID modalityUuid;
-    private String modalityName;
+    private CycleResponseDTO cycle;
+    private CareerResponseDto career;
+    private EducationalModalityResponseDTO modality;
 }

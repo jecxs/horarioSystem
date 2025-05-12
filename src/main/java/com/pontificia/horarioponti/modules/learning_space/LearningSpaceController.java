@@ -18,6 +18,12 @@ import java.util.UUID;
 public class LearningSpaceController {
     private final LearningSpaceService learningSpaceService;
 
+
+    /**
+     * Obtiene todos los espacios de aprendizaje.
+     *
+     * @return Respuesta con lista de DTOs de espacios de aprendizaje.
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<LearningSpaceResponseDTO>>> getAllLearningSpaces() {
         List<LearningSpaceResponseDTO> modalities = learningSpaceService.getAllLearningSpaces();
@@ -26,6 +32,12 @@ public class LearningSpaceController {
         );
     }
 
+    /**
+     * Crea un nuevo espacio de aprendizaje.
+     *
+     * @param requestDTO DTO con los datos para crear el espacio.
+     * @return Respuesta con el DTO del espacio creado.
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<LearningSpaceResponseDTO>> createLearningSpace(
             @Valid @RequestBody LearningSpaceRequestDTO requestDTO) {
@@ -34,7 +46,13 @@ public class LearningSpaceController {
                 .body(ApiResponse.success(createdModality, "Espacio de aprendizaje creada con éxito"));
     }
 
-
+    /**
+     * Actualiza un espacio de aprendizaje existente.
+     *
+     * @param uuid       UUID del espacio de aprendizaje a actualizar.
+     * @param requestDTO DTO con los nuevos datos para actualizar el espacio.
+     * @return Respuesta con el DTO del espacio actualizado.
+     */
     @PatchMapping("/{uuid}")
     public ResponseEntity<ApiResponse<LearningSpaceResponseDTO>> updateLearningSpace(
             @PathVariable UUID uuid,
@@ -45,6 +63,12 @@ public class LearningSpaceController {
         );
     }
 
+    /**
+     * Elimina un espacio de aprendizaje por su UUID.
+     *
+     * @param uuid UUID del espacio de aprendizaje a eliminar.
+     * @return Respuesta con un mensaje de éxito.
+     */
     @DeleteMapping("/{uuid}")
     public ResponseEntity<ApiResponse<Void>> deleteLearningSpace(@PathVariable UUID uuid) {
         learningSpaceService.deleteLearningSpace(uuid);

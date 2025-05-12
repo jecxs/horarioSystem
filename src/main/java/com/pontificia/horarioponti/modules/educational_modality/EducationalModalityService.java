@@ -26,16 +26,34 @@ public class EducationalModalityService extends BaseService<EducationalModalityE
     }
 
 
+    /**
+     * Recupera todas las modalidades educativas disponibles.
+     *
+     * @return Lista de DTOs de modalidades educativas.
+     */
     public List<EducationalModalityResponseDTO> getAllModalities() {
         List<EducationalModalityEntity> modalities = findAll();
         return modalityMapper.toResponseDTOList(modalities);
     }
 
+    /**
+     * Recupera una modalidad educativa por su ID.
+     *
+     * @param uuid UUID de la modalidad educativa a recuperar.
+     * @return DTO de modalidad educativa.
+     */
     public EducationalModalityResponseDTO getModalityById(UUID uuid) {
         EducationalModalityEntity modality = findModalityOrThrow(uuid);
         return modalityMapper.toResponseDTO(modality);
     }
 
+    /**
+     * Crea una nueva modalidad educativa.
+     *
+     * @param requestDTO DTO con los datos de la modalidad educativa a crear.
+     * @return DTO de la modalidad educativa creada.
+     * @throws IllegalArgumentException si ya existe una modalidad educativa con el mismo nombre.
+     */
     @Transactional
     public EducationalModalityResponseDTO createModality(EducationalModalityRequestDTO requestDTO) {
         if (modalityRepository.existsByName(requestDTO.getName())) {
@@ -48,6 +66,14 @@ public class EducationalModalityService extends BaseService<EducationalModalityE
         return modalityMapper.toResponseDTO(savedModality);
     }
 
+    /**
+     * Actualiza los datos de una modalidad educativa existente.
+     *
+     * @param uuid UUID de la modalidad educativa a actualizar.
+     * @param requestDTO DTO con los datos actualizados de la modalidad educativa.
+     * @return DTO de la modalidad educativa actualizada.
+     * @throws IllegalArgumentException si ya existe otra modalidad con el mismo nombre.
+     */
     @Transactional
     public EducationalModalityResponseDTO updateModality(UUID uuid, EducationalModalityRequestDTO requestDTO) {
         EducationalModalityEntity modality = findModalityOrThrow(uuid);
@@ -63,6 +89,11 @@ public class EducationalModalityService extends BaseService<EducationalModalityE
         return modalityMapper.toResponseDTO(updatedModality);
     }
 
+    /**
+     * Elimina una modalidad educativa por su ID.
+     *
+     * @param uuid UUID de la modalidad educativa a eliminar.
+     */
     @Transactional
     public void deleteModality(UUID uuid) {
         EducationalModalityEntity modality = findModalityOrThrow(uuid);
@@ -70,6 +101,13 @@ public class EducationalModalityService extends BaseService<EducationalModalityE
         deleteById(uuid);
     }
 
+    /**
+     * Recupera una modalidad educativa por su UUID, lanzando una excepción si no se encuentra.
+     *
+     * @param uuid UUID de la modalidad educativa.
+     * @return La entidad EducationalModalityEntity correspondiente al UUID.
+     * @throws EntityNotFoundException si no se encuentra la modalidad educativa.
+     */
     private EducationalModalityEntity findModalityOrThrow(UUID uuid) {
         return findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Modalidad educativa no encontrada con ID: " + uuid));

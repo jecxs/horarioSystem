@@ -30,6 +30,13 @@ public class CycleService {
         return cycleRepository.save(request);
     }
 
+    /**
+     * Busca un ciclo académico por su ID. Si no se encuentra, lanza una excepción.
+     *
+     * @param uuid UUID del ciclo a buscar.
+     * @return El ciclo académico correspondiente al UUID proporcionado.
+     * @throws EntityNotFoundException si no se encuentra un ciclo con el UUID dado.
+     */
     public CycleEntity findCycleOrThrow(UUID uuid) {
         return cycleRepository.findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Cycle not found with ID: " + uuid));
