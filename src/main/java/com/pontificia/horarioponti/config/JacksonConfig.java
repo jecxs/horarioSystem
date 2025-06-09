@@ -9,10 +9,8 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
  * Configuración personalizada de Jackson para la serialización y deserialización JSON.
- * <p>
  * Se configura el manejo de referencias circulares, exclusión de valores nulos,
  * formato de fecha y soporte para tipos Java 8 Time API.
- * </p>
  */
 @Configuration
 public class JacksonConfig {
@@ -20,15 +18,11 @@ public class JacksonConfig {
     /**
      * Construye y configura un {@link Jackson2ObjectMapperBuilder} personalizado para
      * la aplicación Spring.
-     * <p>
      * Configuraciones realizadas:
-     * <ul>
-     *     <li>Deshabilita la excepción ante beans vacíos para evitar fallos con referencias circulares.</li>
-     *     <li>Excluye propiedades con valores nulos en la serialización JSON.</li>
-     *     <li>Define un formato estándar para fechas: "yyyy-MM-dd HH:mm:ss".</li>
-     *     <li>Agrega soporte para la API de fechas y horas de Java 8 mediante {@link JavaTimeModule}.</li>
-     * </ul>
-     * </p>
+     *     Deshabilita la excepción ante beans vacíos para evitar fallos con referencias circulares.
+     *     Excluye propiedades con valores nulos en la serialización JSON.
+     *     Define un formato estándar para fechas: "yyyy-MM-dd HH:mm:ss".
+     *     Agrega soporte para la API de fechas y horas de Java 8 mediante {@link JavaTimeModule}.
      *
      * @return un {@link Jackson2ObjectMapperBuilder} configurado para uso en la aplicación.
      */

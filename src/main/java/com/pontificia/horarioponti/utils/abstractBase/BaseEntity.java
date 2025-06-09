@@ -12,6 +12,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Clase base abstracta para todas las entidades persistentes del sistema.
+ *
+ * <p>Incluye atributos comunes como UUID, fecha de creación y fecha de actualización.
+ * También configura listeners para el manejo automático de fechas usando Spring Data JPA.</p>
+ *
+ * <p>Debe ser extendida por todas las entidades del modelo de datos.</p>
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,6 +27,9 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
+    /**
+     * Identificador único universal (UUID) generado automáticamente.
+     */
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -28,10 +39,18 @@ public abstract class BaseEntity {
     @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
 
+    /**
+     * Fecha y hora en la que se creó la entidad.
+     * Asignada automáticamente por Spring Data JPA.
+     */
     @CreatedDate
     @Column(updatable = false, name = "created_at")
     private Date createdAt;
 
+    /**
+     * Fecha y hora de la última modificación de la entidad.
+     * Actualizada automáticamente por Spring Data JPA.
+     */
     @LastModifiedDate
     @Column(name = "updated_at")
     private Date updatedAt;
