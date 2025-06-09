@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LearningSpaceEntity extends BaseEntity {
+
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
@@ -18,6 +19,6 @@ public class LearningSpaceEntity extends BaseEntity {
     private Integer capacity;
 
     @OneToOne
-    @JoinColumn(name = "type_uuid", referencedColumnName = "uuid", unique = true)
+    @JoinColumn(name = "type_uuid", referencedColumnName = "uuid", nullable = false)
     private TeachingTypeEntity typeUUID;
 }

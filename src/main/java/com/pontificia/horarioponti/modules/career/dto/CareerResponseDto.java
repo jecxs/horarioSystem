@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,5 +16,5 @@ public class CareerResponseDto {
     private UUID uuid;
     private String name;
     private EducationalModalityResponseDTO modality;
-    private CycleResponseDTO cycles;
+    private List<CycleResponseDTO> cycles;
 }

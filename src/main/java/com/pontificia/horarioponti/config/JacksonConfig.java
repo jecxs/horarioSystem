@@ -7,18 +7,45 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
+/**
+ * Configuración personalizada de Jackson para la serialización y deserialización JSON.
+ * <p>
+ * Se configura el manejo de referencias circulares, exclusión de valores nulos,
+ * formato de fecha y soporte para tipos Java 8 Time API.
+ * </p>
+ */
 @Configuration
 public class JacksonConfig {
+
+    /**
+     * Construye y configura un {@link Jackson2ObjectMapperBuilder} personalizado para
+     * la aplicación Spring.
+     * <p>
+     * Configuraciones realizadas:
+     * <ul>
+     *     <li>Deshabilita la excepción ante beans vacíos para evitar fallos con referencias circulares.</li>
+     *     <li>Excluye propiedades con valores nulos en la serialización JSON.</li>
+     *     <li>Define un formato estándar para fechas: "yyyy-MM-dd HH:mm:ss".</li>
+     *     <li>Agrega soporte para la API de fechas y horas de Java 8 mediante {@link JavaTimeModule}.</li>
+     * </ul>
+     * </p>
+     *
+     * @return un {@link Jackson2ObjectMapperBuilder} configurado para uso en la aplicación.
+     */
     @Bean
     public Jackson2ObjectMapperBuilder objectMapperBuilder() {
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
 
-        // Configuración para manejar referencias circulares
+        // Configuración para manejar referencias circulares sin fallar
         builder.featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
+        // No incluir propiedades con valor null en la serialización JSON
         builder.serializationInclusion(JsonInclude.Include.NON_NULL);
 
-        // Importante: esta configuración evita el error de profundidad máxima
+        // Formato estándar para fechas y horas
         builder.simpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        // Soporte para tipos de fecha/hora de Java 8
         builder.modules(new JavaTimeModule());
 
         return builder;

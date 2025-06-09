@@ -16,8 +16,8 @@ import java.util.UUID;
 @RequestMapping("/api/protected/learning-space")
 @RequiredArgsConstructor
 public class LearningSpaceController {
-    private final LearningSpaceService learningSpaceService;
 
+    private final LearningSpaceService learningSpaceService;
 
     /**
      * Obtiene todos los espacios de aprendizaje.

@@ -29,7 +29,7 @@ public class CareerMapper {
                         .name(career.getModality().getName())
                         .durationYears(career.getModality().getDurationYears())
                         .build())
-                .cycles((CycleResponseDTO) career.getCycles().stream()
+                .cycles((List<CycleResponseDTO>) career.getCycles().stream()
                         .map(cycle -> CycleResponseDTO.builder()
                                 .uuid(cycle.getUuid())
                                 .number(cycle.getNumber())

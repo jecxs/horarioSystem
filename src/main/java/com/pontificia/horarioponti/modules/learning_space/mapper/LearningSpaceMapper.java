@@ -22,22 +22,33 @@ public class LearningSpaceMapper {
 
     /**
      * Convierte una entidad a un DTO de respuesta
+     *
      * @param entity Entidad a convertir
      * @return DTO de respuesta
      */
     public LearningSpaceResponseDTO toResponseDTO(LearningSpaceEntity entity) {
         if (entity == null) return null;
 
+        TeachingTypeEntity typeEntity = entity.getTypeUUID();
+
+        TeachingTypeResponseDTO teachingTypeDTO = typeEntity != null
+                ? TeachingTypeResponseDTO.builder()
+                .uuid(typeEntity.getUuid())
+                .name(String.valueOf(typeEntity.getName()))
+                .build()
+                : null;
+
         return LearningSpaceResponseDTO.builder()
                 .uuid(entity.getUuid())
                 .name(entity.getName())
                 .capacity(entity.getCapacity())
-                .teachingType(TeachingTypeResponseDTO.builder().build())
+                .teachingType(teachingTypeDTO)
                 .build();
     }
 
     /**
      * Convierte un DTO de solicitud a una entidad para crear
+     *
      * @param requestDTO DTO de solicitud
      * @return Entidad nueva
      */
@@ -48,7 +59,7 @@ public class LearningSpaceMapper {
         entity.setName(requestDTO.getName());
         entity.setCapacity(requestDTO.getCapacity());
 
-        TeachingTypeEntity type = teachingTypeService.findOrThrow(requestDTO.getTypeUUID());
+        TeachingTypeEntity type = teachingTypeService.findOrThrow(requestDTO.getTypeUuid());
         entity.setTypeUUID(type);
 
         return entity;
@@ -56,8 +67,9 @@ public class LearningSpaceMapper {
 
     /**
      * Actualiza una entidad existente con datos del DTO de solicitud
+     *
      * @param requestDTO DTO con datos nuevos
-     * @param entity Entidad a actualizar
+     * @param entity     Entidad a actualizar
      */
     public void updateEntityFromDTO(LearningSpaceRequestDTO requestDTO, LearningSpaceEntity entity) {
         if (requestDTO == null || entity == null) return;
@@ -65,12 +77,13 @@ public class LearningSpaceMapper {
         entity.setName(requestDTO.getName());
         entity.setCapacity(requestDTO.getCapacity());
 
-        TeachingTypeEntity type = teachingTypeService.findOrThrow(requestDTO.getTypeUUID());
+        TeachingTypeEntity type = teachingTypeService.findOrThrow(requestDTO.getTypeUuid());
         entity.setTypeUUID(type);
     }
 
     /**
      * Convierte una lista de entidades a DTO de respuesta
+     *
      * @param entities Lista de entidades
      * @return Lista de DTOs
      */
