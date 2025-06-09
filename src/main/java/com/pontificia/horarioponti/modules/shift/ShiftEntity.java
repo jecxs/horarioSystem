@@ -14,8 +14,8 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class ShiftEntity extends BaseEntity {
-    @Column(name = "name", nullable = false, length = 10)
-    private String name;
+    @Column(name = "code", nullable = false, length = 10)
+    private String code;
 
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;

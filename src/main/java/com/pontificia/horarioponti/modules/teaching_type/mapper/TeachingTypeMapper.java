@@ -2,37 +2,43 @@ package com.pontificia.horarioponti.modules.teaching_type.mapper;
 
 import com.pontificia.horarioponti.modules.teaching_type.TeachingTypeEntity;
 import com.pontificia.horarioponti.modules.teaching_type.dto.TeachingTypeResponseDTO;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Component
-public class TeachingTypeMapper {
-    /**
-     * Convierte una entidad TeachingTypeEntity a su correspondiente DTO TeachingTypeResponseDTO.
-     *
-     * @param entity La entidad TeachingTypeEntity que se quiere convertir.
-     * @return El DTO TeachingTypeResponseDTO correspondiente a la entidad.
-     */
-    public TeachingTypeResponseDTO toResponseDTO(TeachingTypeEntity entity) {
-        if (entity == null) return null;
-
-        return TeachingTypeResponseDTO.builder()
-                .uuid(entity.getUuid())
-                .name(entity.getName().name())
-                .build();
-    }
+@Mapper(componentModel = "spring")
+public interface TeachingTypeMapper {
 
     /**
-     * Convierte una lista de entidades TeachingTypeEntity a una lista de DTO TeachingTypeResponseDTO.
+     * Convierte una entidad {@link TeachingTypeEntity} a su correspondiente DTO {@link TeachingTypeResponseDTO}.
+     * Mapea el campo enum 'name' a su representación {@link String} mediante el método {@link #enumName(Enum)}.
      *
-     * @param entities La lista de entidades TeachingTypeEntity que se quieren convertir.
-     * @return La lista de DTO TeachingTypeResponseDTO correspondiente a las entidades.
+     * @param entity La entidad que se quiere convertir.
+     * @return El DTO correspondiente, o {@code null} si la entidad es {@code null}.
      */
-    public List<TeachingTypeResponseDTO> toResponseDTOList(List<TeachingTypeEntity> entities) {
-        return entities.stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+    @Mapping(source = "name", target = "name", qualifiedByName = "enumName")
+    TeachingTypeResponseDTO toResponseDTO(TeachingTypeEntity entity);
+
+
+    /**
+     * Convierte una lista de entidades {@link TeachingTypeEntity} a una lista de DTO {@link TeachingTypeResponseDTO}.
+     *
+     * @param entities Lista de entidades a convertir.
+     * @return Lista de DTOs correspondientes.
+     */
+    List<TeachingTypeResponseDTO> toResponseDTOList(List<TeachingTypeEntity> entities);
+
+    /**
+     * Convierte un valor enum a su nombre {@link String}.
+     * Este método es usado por MapStruct para mapear el campo enum {@code name} a {@link String} en el DTO.
+     *
+     * @param enumValue Valor enum a convertir.
+     * @return El nombre del enum como {@link String}, o {@code null} si el valor es {@code null}.
+     */
+    @Named("enumName")
+    default String enumName(Enum<?> enumValue) {
+        return enumValue == null ? null : enumValue.name();
     }
 }

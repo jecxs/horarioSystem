@@ -47,6 +47,10 @@
         compileOnly 'org.projectlombok:lombok'                                             // Lombok para anotaciones
         annotationProcessor 'org.projectlombok:lombok'                                     // Procesador de anotaciones de Lombok
 
+        // MapStruct - importante incluir también el procesador de anotaciones
+        implementation 'org.mapstruct:mapstruct:1.6.2'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+
         // Testing
         testImplementation 'org.springframework.boot:spring-boot-starter-test'             // Testing con Spring Boot
         testImplementation 'org.springframework.security:spring-security-test'             // Testing para seguridad

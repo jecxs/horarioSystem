@@ -61,7 +61,7 @@ public class CourseMapper {
     }
 
     /**
-     * Convierte una lista de entidades CourseEntity en una lista de DTOs CourseResponseDTO.
+     * Convierte una lista de entidades CourseEntity en una lista de DTO CourseResponseDTO.
      *
      * @param entities Lista de entidades CourseEntity a convertir.
      * @return Lista de DTOs CourseResponseDTO.
